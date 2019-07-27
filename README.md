@@ -22,3 +22,5 @@ Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 VisualStudioのプロパティマネージャーで下記ユーザーマクロを設定してください。
 
 Setup following user macros in Property Manager of Visual Studio.
+
+![image](https://user-images.githubusercontent.com/530182/61995780-d7fa5b00-b0c7-11e9-9efd-8d7d3534c5eb.png)
