@@ -90,9 +90,9 @@ __declspec(dllexport) bool K4ABT_End()
 	return true;
 }
 
-bool K4ABT_GetSkeleton(float* buffer, int length)
+bool K4ABT_GetBodies(void* buffer, int length)
 {
-	memcpy(buffer, tracker->skeleton, sizeof(float) * length);
+	memcpy(buffer, tracker->bodies, sizeof(k4abt_body_t) * length);
 	return true;
 }
 

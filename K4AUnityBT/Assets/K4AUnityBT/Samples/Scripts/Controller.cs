@@ -7,7 +7,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 {
     public class Controller : MonoBehaviour
     {
-        public GameObject[] joints;
+        public BodyVisualizer[] bodyVisualizers;
         public Material depthMaterial;
         public Material colorMaterial;
         public Material transformedDepthMaterial;
@@ -51,12 +51,10 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
             while (true)
             {
-                var skeleton = AzureKinectBodyTracker.GetSkeleton();
-
-                for (var i = 0; i < skeleton.Length; i++)
+                var bodies = AzureKinectBodyTracker.GetBodies();
+                for (var i = 0; i < bodies.Length; i++)
                 {
-                    //Debug.Log($"{i} - X:{skeleton[i].x} Y:{skeleton[i].y} Z:{skeleton[i].z}");
-                    this.joints[i].transform.localPosition = skeleton[i] / 1000f;
+                    this.bodyVisualizers[i].Apply(bodies[i]);
                 }
 
                 this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.depthTexture, depthTextureId);

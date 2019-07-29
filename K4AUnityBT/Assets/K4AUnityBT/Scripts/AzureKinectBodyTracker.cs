@@ -5,8 +5,69 @@ using UnityEngine;
 
 namespace AzureKinect.Unity.BodyTracker
 {
+    public enum JointIndex
+    {
+        Pelvis = 0,
+        SpineNaval,
+        SpineChest,
+        Neck,
+        ClavicleLeft,
+        SholderLeft,
+        ElbowLeft,
+        WristLeft,
+        ClavicleRight,
+        SholderRight,
+        ElbowRight,
+        WristRight,
+        HipLeft,
+        KneeLeft,
+        AnkleLeft,
+        FootLeft,
+        HipRight,
+        KneeRight,
+        AnkleRight,
+        FootRight,
+        Head,
+        Nose,
+        EyeLeft,
+        EarLeft,
+        EyeRight,
+        EarRight,
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Joint
+    {
+        public Vector3 position;
+        public Quaternion orientation;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Skeleton
+    {
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)JointIndex.EarRight + 1)]
+        public Joint[] joints;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Body
+    {
+        public uint id;
+        public Skeleton skeleton;
+
+        public bool IsActive
+        {
+            get
+            {
+                return ((this.id > 0) && (this.skeleton.joints != null) && (this.skeleton.joints.Length > 0));
+            }
+        }
+    };
+
     public static class AzureKinectBodyTracker
     {
+        public const int MaxBody = 6;
+
         private static bool IsValidPlatform()
         {
             switch (Application.platform)
@@ -75,28 +136,36 @@ namespace AzureKinect.Unity.BodyTracker
             }
         }
 
+        private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
+        private static int bodiesBufferSize = bodyBufferSize * MaxBody;
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_GetSkeleton(IntPtr buffer, uint bufferSize);
-        public static Vector3[] GetSkeleton()
+        private static extern bool K4ABT_GetBodies(IntPtr buffer, uint bufferSize);
+        public static Body[] GetBodies()
         {
-            var result = new Vector3[25];
+            var result = new Body[MaxBody]
+                {
+                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
+                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
+                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
+                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
+                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
+                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
+            };
             if (IsValidPlatform())
             {
-                var buffer = new float[3 * 25];
-                var allocatedMemory = Marshal.AllocHGlobal(sizeof(float) * buffer.Length);
-                K4ABT_GetSkeleton(allocatedMemory, (uint)buffer.Length);
-                Marshal.Copy(allocatedMemory, buffer, 0, buffer.Length);
-                Marshal.FreeHGlobal(allocatedMemory);
-
-                for (var i = 0; i < 25; i++)
+                var allocatedMemory = Marshal.AllocHGlobal(bodiesBufferSize);
+                K4ABT_GetBodies(allocatedMemory, MaxBody);
+                var p = allocatedMemory;
+                for (int i = 0; i < MaxBody; i++)
                 {
-                    result[i] = new Vector3(buffer[i * 3 + 0], buffer[i * 3 + 1], buffer[i * 3 + 2]);
+                    result[i] = (Body)Marshal.PtrToStructure(p, typeof(Body));
+                    p += bodyBufferSize;
                 }
+                Marshal.FreeHGlobal(allocatedMemory);
             }
             return result;
         }
-
     }
 
     public class K4ABTException : Exception

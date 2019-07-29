@@ -75,7 +75,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(UnityInstallDirectory)\Editor\Data\PluginAPI;$(AzureKinectBodyTrackingSDK)\sdk\include;$(AzureKinectSDK)\sdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(UnityInstallDirectory)\Editor\Data\PluginAPI;$(AzureKinectSDK)\sdk\include;$(AzureKinectBodyTrackingSDK)\sdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(AzureKinectSDK)\sdk\windows-desktop\amd64\release\lib;$(AzureKinectBodyTrackingSDK)\sdk\windows-desktop\amd64\release\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

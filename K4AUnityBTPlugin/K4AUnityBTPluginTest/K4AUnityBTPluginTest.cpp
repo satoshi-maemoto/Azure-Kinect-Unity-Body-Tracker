@@ -2,8 +2,12 @@
 #include "CppUnitTest.h"
 #include "K4AUnityBTPlugin.h"
 #include <thread>
+#include <k4abt.h>
+#include "KinectBodyTracker.h"
+
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace std;
 
 namespace K4AUnityBTPluginTest
 {
@@ -23,15 +27,26 @@ namespace K4AUnityBTPluginTest
 
 			for (auto i = 0; i < 10; i++)
 			{
-				std::this_thread::sleep_for(std::chrono::seconds(1));
+				this_thread::sleep_for(chrono::seconds(1));
 
-				const int bufferLength = 3 * 25;
-				float buffer[bufferLength];
-				K4ABT_GetSkeleton(buffer, bufferLength);
-
-				for (auto i = 0; i < bufferLength; i++)
+				k4abt_body_t bodies[K4ABT_MAX_BODY];
+				K4ABT_GetBodies(bodies, K4ABT_MAX_BODY);
+				for (auto i = 0; i < K4ABT_MAX_BODY; i++)
 				{
-					DebugLog(std::to_string(buffer[i]).c_str());
+					for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
+					{
+						DebugLog((
+							"ID:" + to_string(bodies[i].id) + " J:" +
+							to_string(j) + " (" + 
+							to_string(bodies[i].skeleton.joints[j].position.xyz.x) + "," +
+							to_string(bodies[i].skeleton.joints[j].position.xyz.y) + "," +
+							to_string(bodies[i].skeleton.joints[j].position.xyz.z) + ") (" +
+							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.x) + "," +
+							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.y) + "," +
+							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.z) + "," +
+							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.w) + ")"
+							).c_str());
+					}
 				}
 			}
 

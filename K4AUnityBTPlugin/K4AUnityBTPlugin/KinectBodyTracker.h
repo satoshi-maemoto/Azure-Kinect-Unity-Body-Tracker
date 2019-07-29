@@ -3,13 +3,15 @@
 #include <k4a/k4a.h>
 #include <k4abt.h>
 
+#define K4ABT_MAX_BODY 6
+
 class KinectBodyTracker
 {
 public:
 	void Start();
 	void Stop();
 
-	float skeleton[3 * (K4ABT_JOINT_COUNT - 1)];
+	k4abt_body_t bodies[K4ABT_MAX_BODY];
 	unsigned long* color;
 	unsigned short* depth;
 	unsigned short* transformedDepth;
