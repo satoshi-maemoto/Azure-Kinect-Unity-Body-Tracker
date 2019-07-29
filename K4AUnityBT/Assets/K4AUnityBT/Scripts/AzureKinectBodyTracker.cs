@@ -143,15 +143,7 @@ namespace AzureKinect.Unity.BodyTracker
         private static extern bool K4ABT_GetBodies(IntPtr buffer, uint bufferSize);
         public static Body[] GetBodies()
         {
-            var result = new Body[MaxBody]
-                {
-                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
-                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
-                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
-                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
-                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
-                new Body() { skeleton = new Skeleton() { joints = new Joint[(int)JointIndex.EarRight + 1] } },
-            };
+            var result = new Body[MaxBody];
             if (IsValidPlatform())
             {
                 var allocatedMemory = Marshal.AllocHGlobal(bodiesBufferSize);
