@@ -1,11 +1,10 @@
 ﻿using AzureKinect.Unity.BodyTracker;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BodyVisualizer : MonoBehaviour
 {
-    public int id = 1;
+    public int bodyIndex = 0;
     public Material[] jointMaterials;
     public GameObject jointPrefab;
     public bool IsActive { get; private set; } = true;
@@ -19,19 +18,19 @@ public class BodyVisualizer : MonoBehaviour
         {
             var jointObject = GameObject.Instantiate(this.jointPrefab, Vector3.zero, Quaternion.identity, this.transform);
             var jointRenderer = jointObject.GetComponent<Renderer>();
-            jointRenderer.material = this.jointMaterials[this.id - 1];
+            jointRenderer.material = this.jointMaterials[this.bodyIndex];
             this.jointRenderers.Add(jointRenderer);
         }
     }
 
-    public void Apply(Body body)
+    public void Apply(Body body, int bodyIndex)
     {
         if (this.jointRenderers == null)
         {
             return;
         }
 
-        var isActive = body.IsActive && (body.id == this.id);
+        var isActive = body.IsActive && (bodyIndex == this.bodyIndex);
         if (isActive != this.IsActive)
         {
             foreach (var renderer in this.jointRenderers)

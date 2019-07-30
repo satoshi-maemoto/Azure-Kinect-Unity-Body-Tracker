@@ -54,7 +54,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 var bodies = AzureKinectBodyTracker.GetBodies();
                 for (var i = 0; i < bodies.Length; i++)
                 {
-                    this.bodyVisualizers[i].Apply(bodies[i]);
+                    this.bodyVisualizers[i].Apply(bodies[i], i);
                 }
 
                 this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.depthTexture, depthTextureId);
