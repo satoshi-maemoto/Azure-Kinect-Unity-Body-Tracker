@@ -64,6 +64,7 @@ void KinectBodyTracker::Start()
 						if (this->color != nullptr)
 						{
 							memcpy(this->color, k4a_image_get_buffer(colorImage), colorImageSize);
+							this->colorTimestamp = k4a_image_get_timestamp_usec(colorImage);
 						}
 						k4a_image_release(colorImage);
 					}
@@ -82,6 +83,7 @@ void KinectBodyTracker::Start()
 						if (this->depth != nullptr)
 						{
 							memcpy(this->depth, k4a_image_get_buffer(depthImage), depthImageSize);
+							this->depthTimestamp = k4a_image_get_timestamp_usec(depthImage);
 						}
 
 						if ((transformedDepthImage == nullptr) && ((colorImageWidth != -1) && (colorImageHeight != -1)))
@@ -103,22 +105,23 @@ void KinectBodyTracker::Start()
 								if (this->transformedDepth != nullptr)
 								{
 									memcpy(this->transformedDepth, k4a_image_get_buffer(transformedDepthImage), transformedDepthSize);
+									this->transformedDepthTimestamp = k4a_image_get_timestamp_usec(transformedDepthImage);
 								}
 							}
+						}
+
+						auto queueCaptureResult = k4abt_tracker_enqueue_capture(this->tracker, capture, 0);
+						k4a_capture_release(capture);
+						if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
+						{
+							this->DebugLog("Error! Add capture to tracker process queue failed!\n");
 						}
 
 						k4a_image_release(depthImage);
 					}
 
-					auto queueCaptureResult = k4abt_tracker_enqueue_capture(this->tracker, capture, K4A_WAIT_INFINITE);
-					k4a_capture_release(capture);
-					if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
-					{
-						printf("Error! Add capture to tracker process queue failed!\n");
-					}
-
 					k4abt_frame_t bodyFrame = nullptr;
-					if (k4abt_tracker_pop_result(this->tracker, &bodyFrame, K4A_WAIT_INFINITE) == K4A_WAIT_RESULT_SUCCEEDED)
+					if (k4abt_tracker_pop_result(this->tracker, &bodyFrame, 0) == K4A_WAIT_RESULT_SUCCEEDED)
 					{
 						auto numBodies = k4abt_frame_get_num_bodies(bodyFrame);
 						memset(this->bodies, 0, sizeof(k4abt_body_t) * K4ABT_MAX_BODY);
@@ -127,7 +130,6 @@ void KinectBodyTracker::Start()
 							this->bodies[i].id = k4abt_frame_get_body_id(bodyFrame, i);
 							k4abt_frame_get_body_skeleton(bodyFrame, i, &this->bodies[i].skeleton);
 						}
-
 						k4abt_frame_release(bodyFrame);
 					}
 				}
@@ -141,6 +143,8 @@ void KinectBodyTracker::Start()
 			{
 				k4a_transformation_destroy(transformation);
 			}
+
+			this->DebugLog("Finished worker thread\n");
 		}
 	);
 }
@@ -148,16 +152,30 @@ void KinectBodyTracker::Start()
 void KinectBodyTracker::Stop()
 {
 	this->isRunning = false;
+	k4abt_tracker_shutdown(this->tracker);
 	this->workerThread.join();
 
 	free(this->depth);
 	free(this->color);
 	free(this->transformedDepth);
 
-	k4abt_tracker_shutdown(this->tracker);
 	k4abt_tracker_destroy(this->tracker);
 	k4a_device_stop_cameras(this->device);
 	k4a_device_close(this->device);
 
-	printf("Finished body tracking processing!\n");
+	this->DebugLog("Finished body tracking processing!\n");
+}
+
+void KinectBodyTracker::SetDebugLogFunction(DebugLogFuncPtr fp)
+{
+	this->debugPrintFunction = fp;
+}
+
+void KinectBodyTracker::DebugLog(const char* message)
+{
+	if (this->debugPrintFunction != nullptr)
+	{
+		this->debugPrintFunction(message);
+	}
+	printf("%s\n", message);
 }

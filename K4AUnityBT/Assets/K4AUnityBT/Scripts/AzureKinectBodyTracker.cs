@@ -82,15 +82,15 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void DebugDelegate(string message);
+        public delegate void DebugLogDelegate(string message);
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern void K4ABT_SetDebugFunction(IntPtr fp);
-        public static void SetDebugFunction(IntPtr fp)
+        private static extern void K4ABT_SetDebugLogFunction(IntPtr fp);
+        public static void SetDebugLogFunction(IntPtr fp)
         {
             if (IsValidPlatform())
             {
-                K4ABT_SetDebugFunction(fp);
+                K4ABT_SetDebugLogFunction(fp);
             }
         }
 
@@ -129,6 +129,7 @@ namespace AzureKinect.Unity.BodyTracker
         {
             if (IsValidPlatform())
             {
+                SetDebugLogFunction(IntPtr.Zero);
                 if (!K4ABT_End())
                 {
                     throw new K4ABTException(GetLastErrorMessage());

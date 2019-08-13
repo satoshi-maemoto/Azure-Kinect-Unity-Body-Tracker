@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -27,9 +28,9 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             this.commandBuffer = new CommandBuffer();
             this.commandBuffer.name = "AzureKinectImagesUpdeate";
 
-            var debugDelegate = new AzureKinectBodyTracker.DebugDelegate(PluginDebugCallBack);
+            var debugDelegate = new AzureKinectBodyTracker.DebugLogDelegate(PluginDebugCallBack);
             var functionPointer = Marshal.GetFunctionPointerForDelegate(debugDelegate);
-            AzureKinectBodyTracker.SetDebugFunction(functionPointer);
+            AzureKinectBodyTracker.SetDebugLogFunction(functionPointer);
 
             this.StartCoroutine(this.Process());
         }
@@ -47,8 +48,12 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             this.transformedDepthMaterial.mainTexture = this.transformedDepthTexture;
 
             var callback = AzureKinectBodyTracker.GetTextureUpdateCallback();
-            AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId);
+            this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.depthTexture, depthTextureId);
+            this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.colorTexture, colorTextureId);
+            this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
 
+            AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId);
+            var startedTime = Time.realtimeSinceStartup;
             while (true)
             {
                 var bodies = AzureKinectBodyTracker.GetBodies();
@@ -57,11 +62,8 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                     this.bodyVisualizers[i].Apply(bodies[i], i);
                 }
 
-                this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.depthTexture, depthTextureId);
-                this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.colorTexture, colorTextureId);
-                this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
                 Graphics.ExecuteCommandBuffer(this.commandBuffer);
-                this.commandBuffer.Clear();
+                //Debug.Log($"Update Timestamp: {(Time.realtimeSinceStartup - startedTime)}");
 
                 yield return null;
             }

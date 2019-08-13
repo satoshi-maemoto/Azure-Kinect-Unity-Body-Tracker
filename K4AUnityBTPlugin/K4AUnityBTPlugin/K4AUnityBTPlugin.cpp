@@ -4,7 +4,7 @@
 #include "Utils.h"
 #include "KinectBodyTracker.h"
 
-static FuncPtr debugPrintFunction = nullptr;
+static DebugLogFuncPtr debugPrintFunction = nullptr;
 static string lastErrorMessage = string();
 static KinectBodyTracker* tracker = nullptr;
 static unsigned int outputDepthTextureId = 0;
@@ -37,7 +37,7 @@ void DebugLog(const char* message)
 	printf("%s\n", message);
 }
 
-void K4ABT_SetDebugFunction(FuncPtr fp)
+void K4ABT_SetDebugLogFunction(DebugLogFuncPtr fp)
 {
 	debugPrintFunction = fp;
 }
@@ -57,6 +57,7 @@ __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int
 		if (tracker == nullptr)
 		{
 			tracker = new KinectBodyTracker();
+			tracker->SetDebugLogFunction(debugPrintFunction);
 		}
 		outputDepthTextureId = depthTextureId;
 		outputColorTextureId = coloTextureId;
@@ -108,14 +109,17 @@ void OnTextureUpdate(int eventId, void* pData)
 		{
 			//DebugLog(::to_string(tracker->depth[288 * 640 + 320 + 0]).c_str());
 			pParams->texData = tracker->depth;
+			//DebugLog(("Depth Timestamp: " + ::to_string(tracker->depthTimestamp)).c_str());
 		}
 		if ((outputColorTextureId == id))
 		{
 			pParams->texData = tracker->color;
+			//DebugLog(("Color Timestamp: " + ::to_string(tracker->colorTimestamp)).c_str());
 		}
 		if ((outputTransformedDepthTextureId == id))
 		{
 			pParams->texData = tracker->transformedDepth;
+			//DebugLog(("Transformed Depth Timestamp: " + ::to_string(tracker->transformedDepthTimestamp)).c_str());
 		}
 	}
 	else if (event == kUnityRenderingExtEventUpdateTextureEndV2)

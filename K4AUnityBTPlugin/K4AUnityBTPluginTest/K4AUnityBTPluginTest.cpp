@@ -21,7 +21,7 @@ namespace K4AUnityBTPluginTest
 
 		TEST_METHOD(RunTest)
 		{
-			K4ABT_SetDebugFunction(DebugLog);
+			K4ABT_SetDebugLogFunction(DebugLog);
 
 			K4ABT_Start(-1, -1, -1);
 
