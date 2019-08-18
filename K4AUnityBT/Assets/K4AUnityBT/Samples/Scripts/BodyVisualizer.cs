@@ -8,6 +8,7 @@ public class BodyVisualizer : MonoBehaviour
     public Material[] jointMaterials;
     public GameObject jointPrefab;
     public bool IsActive { get; private set; } = true;
+    public bool IsMirror = true;
 
     private IList<Renderer> jointRenderers;
 
@@ -44,7 +45,8 @@ public class BodyVisualizer : MonoBehaviour
         {
             for (var i = 0; i < this.jointRenderers.Count; i++)
             {
-                this.jointRenderers[i].transform.localPosition = body.skeleton.joints[i].position / 1000f;
+                var jointPosition = body.skeleton.joints[i].position;
+                this.jointRenderers[i].transform.localPosition = new Vector3(jointPosition.x * (this.IsMirror ? -1 : 1), jointPosition.y * -1, jointPosition.z) / 1000f;
             }
         }
     }
