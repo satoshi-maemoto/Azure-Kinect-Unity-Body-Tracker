@@ -24,7 +24,7 @@ Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 * dnn_model.onnx
 * onnxruntime.dll
 
-# Setup to build the plugin
+## Setup to build the plugin
 
 VisualStudioのプロパティマネージャーで下記ユーザーマクロを設定してください。
 
