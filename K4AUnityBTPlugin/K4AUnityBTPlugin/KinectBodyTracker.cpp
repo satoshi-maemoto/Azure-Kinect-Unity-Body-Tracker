@@ -25,7 +25,10 @@ void KinectBodyTracker::Start()
 		"Get depth camera calibration failed!");
 
 	this->tracker = nullptr;
-	VERIFY(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
+	auto ret = k4abt_tracker_create(&calibration, &this->tracker);
+//	VERIFY(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
+	VERIFY(ret, "Body tracker initialization failed!");
+
 
 	this->depth = nullptr;
 	this->color = nullptr;
