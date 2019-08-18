@@ -27,6 +27,7 @@ void KinectBodyTracker::Start()
 	this->tracker = nullptr;
 	VERIFY(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
 
+
 	this->depth = nullptr;
 	this->color = nullptr;
 	this->transformedDepth = nullptr;
