@@ -108,10 +108,10 @@
       <AdditionalDependencies>K4AUnityBTPlugin.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(AzureKinectBodyTrackingSDK)tools\depthengine_1_0.dll" $(OutDir)
+      <Command>copy "$(AzureKinectSDK)tools\depthengine_2_0.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\dnn_model.onnx" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\glfw3.dll" $(OutDir)
-copy "$(AzureKinectBodyTrackingSDK)tools\k4a.dll" $(OutDir)
+copy "$(AzureKinectSDK)tools\k4a.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\k4abt.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
 </Command>
@@ -174,10 +174,10 @@ copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
       <AdditionalDependencies>K4AUnityBTPlugin.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(AzureKinectBodyTrackingSDK)tools\depthengine_1_0.dll" $(OutDir)
+      <Command>copy "$(AzureKinectSDK)tools\depthengine_2_0.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\dnn_model.onnx" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\glfw3.dll" $(OutDir)
-copy "$(AzureKinectBodyTrackingSDK)tools\k4a.dll" $(OutDir)
+copy "$(AzureKinectSDK)tools\k4a.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\k4abt.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
 

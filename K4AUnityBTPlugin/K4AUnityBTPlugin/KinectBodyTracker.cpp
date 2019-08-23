@@ -1,14 +1,22 @@
 #include "pch.h"
 #include "KinectBodyTracker.h"
+#include "Utils.h"
 
 using namespace std;
 
-#define VERIFY(result, error)                                                                            \
-    if(result != K4A_RESULT_SUCCEEDED)                                                                   \
-    {                                                                                                    \
-        printf("%s \n - (File: %s, Function: %s, Line: %d)\n", error, __FILE__, __FUNCTION__, __LINE__); \
-        throw exception(error);                                                                          \
-    }
+void Verify(k4a_result_t result, string error)
+{
+	if (result != K4A_RESULT_SUCCEEDED)
+	{
+		auto lastError = GetLastError();
+		LPTSTR lastErrorMessage = nullptr;
+		FormatMessage(
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_ALLOCATE_BUFFER,
+			nullptr, lastError, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), (LPWSTR)&lastErrorMessage, 0, nullptr);
+		printf("%s \n - (File: %s, Function: %s, Line: %d)\n", error.c_str(), __FILE__, __FUNCTION__, __LINE__);
+		throw exception((error + string(" : ") + Utils::WStringToString(wstring(lastErrorMessage))).c_str());
+	}
+}
 
 void KinectBodyTracker::Start()
 {
@@ -17,15 +25,15 @@ void KinectBodyTracker::Start()
 	deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_1080P;
 	deviceConfig.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
-	VERIFY(k4a_device_open(0, &this->device), "Open K4A Device failed!");
-	VERIFY(k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
+	Verify(k4a_device_open(0, &this->device), "Open K4A Device failed!");
+	Verify(k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
 
 	k4a_calibration_t calibration;
-	VERIFY(k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
+	Verify(k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
 		"Get depth camera calibration failed!");
 
 	this->tracker = nullptr;
-	VERIFY(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
+	Verify(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
 
 
 	this->depth = nullptr;
@@ -65,7 +73,7 @@ void KinectBodyTracker::Start()
 						if (this->color != nullptr)
 						{
 							memcpy(this->color, k4a_image_get_buffer(colorImage), colorImageSize);
-							this->colorTimestamp = k4a_image_get_timestamp_usec(colorImage);
+							this->colorTimestamp = k4a_image_get_device_timestamp_usec(colorImage);
 						}
 						k4a_image_release(colorImage);
 					}
@@ -84,7 +92,7 @@ void KinectBodyTracker::Start()
 						if (this->depth != nullptr)
 						{
 							memcpy(this->depth, k4a_image_get_buffer(depthImage), depthImageSize);
-							this->depthTimestamp = k4a_image_get_timestamp_usec(depthImage);
+							this->depthTimestamp = k4a_image_get_device_timestamp_usec(depthImage);
 						}
 
 						if ((transformedDepthImage == nullptr) && ((colorImageWidth != -1) && (colorImageHeight != -1)))
@@ -106,7 +114,7 @@ void KinectBodyTracker::Start()
 								if (this->transformedDepth != nullptr)
 								{
 									memcpy(this->transformedDepth, k4a_image_get_buffer(transformedDepthImage), transformedDepthSize);
-									this->transformedDepthTimestamp = k4a_image_get_timestamp_usec(transformedDepthImage);
+									this->transformedDepthTimestamp = k4a_image_get_device_timestamp_usec(transformedDepthImage);
 								}
 							}
 						}

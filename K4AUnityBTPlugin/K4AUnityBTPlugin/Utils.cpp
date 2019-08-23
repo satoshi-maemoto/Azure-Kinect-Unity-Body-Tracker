@@ -3,10 +3,10 @@
 
 string Utils::WStringToString(wstring wideString)
 {
-	int bufferSize = WideCharToMultiByte(CP_OEMCP, 0, wideString.c_str(), -1, (char*)NULL, 0, NULL, NULL);
+	int bufferSize = WideCharToMultiByte(CP_OEMCP, 0, wideString.c_str(), -1, (char*)nullptr, 0, nullptr, nullptr);
 	CHAR* multiByteString = new CHAR[bufferSize];
 
-	WideCharToMultiByte(CP_OEMCP, 0, wideString.c_str(), -1, multiByteString, bufferSize, NULL, NULL);
+	WideCharToMultiByte(CP_OEMCP, 0, wideString.c_str(), -1, multiByteString, bufferSize, nullptr, nullptr);
 
 	string result(multiByteString, multiByteString + bufferSize - 1);
 	delete[] multiByteString;
