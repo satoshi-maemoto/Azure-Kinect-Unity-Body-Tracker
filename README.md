@@ -11,7 +11,7 @@ Not for General purpose.
 ## Environment
 
 * Unity2019.2.x
-* Azure Kinect SDK v1.1.0
+* Azure Kinect SDK v1.2.0
 * Azure Kinect Body Tracking SDK v0.9.1
 
 ## Setup to run
@@ -20,9 +20,15 @@ Not for General purpose.
 
 Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 
-* depthengine_1_0.dll
 * dnn_model.onnx
 * onnxruntime.dll
+
+
+下記ファイルを Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUnityBT\Plugins\x86_64 配下に配置してください。
+
+Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUnityBT\Plugins\x86_64".
+
+* depthengine_2_0.dll
 
 ## Setup to build the plugin
 

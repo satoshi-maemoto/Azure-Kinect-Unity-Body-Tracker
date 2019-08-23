@@ -35,5 +35,5 @@ sysinfo.txt
 *.apk
 *.unitypackage
 
-depthengine_1_0.dll
+depthengine*.dll
 dnn_model.onnx
