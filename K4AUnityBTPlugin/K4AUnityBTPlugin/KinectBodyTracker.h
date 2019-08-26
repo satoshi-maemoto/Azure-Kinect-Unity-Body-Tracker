@@ -10,16 +10,22 @@ typedef void(*DebugLogFuncPtr)(const char*);
 class KinectBodyTracker
 {
 public:
+
+	typedef struct Body {
+		k4abt_body_t body;
+		k4a_float2_t calibratedJointPoints[K4ABT_JOINT_COUNT];
+	} Body;
+
 	void Start();
 	void Stop();
 	void SetDebugLogFunction(DebugLogFuncPtr fp);
 
-	k4abt_body_t bodies[K4ABT_MAX_BODY];
-	unsigned long* color;
+	Body bodies[K4ABT_MAX_BODY];
+	unsigned long* color = nullptr;
 	uint64_t colorTimestamp;
-	unsigned short* depth;
+	unsigned short* depth = nullptr;
 	uint64_t depthTimestamp;
-	unsigned short* transformedDepth;
+	unsigned short* transformedDepth = nullptr;
 	uint64_t transformedDepthTimestamp;
 
 private:

@@ -50,16 +50,24 @@ namespace AzureKinect.Unity.BodyTracker
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Body
+    public struct RawBody
     {
         public uint id;
         public Skeleton skeleton;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Body
+    {
+        public RawBody body;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)JointIndex.EarRight + 1)]
+        public Vector2[] calibratedJointPoints;
 
         public bool IsActive
         {
             get
             {
-                return ((this.id > 0) && (this.skeleton.joints != null) && (this.skeleton.joints.Length > 0));
+                return ((this.body.id > 0) && (this.body.skeleton.joints != null) && (this.body.skeleton.joints.Length > 0));
             }
         }
     };

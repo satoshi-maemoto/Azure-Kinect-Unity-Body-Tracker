@@ -29,22 +29,24 @@ namespace K4AUnityBTPluginTest
 			{
 				this_thread::sleep_for(chrono::seconds(1));
 
-				k4abt_body_t bodies[K4ABT_MAX_BODY];
+				KinectBodyTracker::Body bodies[K4ABT_MAX_BODY];
 				K4ABT_GetBodies(bodies, K4ABT_MAX_BODY);
 				for (auto i = 0; i < K4ABT_MAX_BODY; i++)
 				{
 					for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
 					{
 						DebugLog((
-							"ID:" + to_string(bodies[i].id) + " J:" +
-							to_string(j) + " (" + 
-							to_string(bodies[i].skeleton.joints[j].position.xyz.x) + "," +
-							to_string(bodies[i].skeleton.joints[j].position.xyz.y) + "," +
-							to_string(bodies[i].skeleton.joints[j].position.xyz.z) + ") (" +
-							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.x) + "," +
-							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.y) + "," +
-							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.z) + "," +
-							to_string(bodies[i].skeleton.joints[j].orientation.wxyz.w) + ")"
+							"ID:" + to_string(bodies[i].body.id) + " J:" +
+							to_string(j) + " P(" + 
+							to_string(bodies[i].body.skeleton.joints[j].position.xyz.x) + "," +
+							to_string(bodies[i].body.skeleton.joints[j].position.xyz.y) + "," +
+							to_string(bodies[i].body.skeleton.joints[j].position.xyz.z) + ") C(" +
+							to_string(bodies[i].calibratedJointPoints[j].xy.x) + "," +
+							to_string(bodies[i].calibratedJointPoints[j].xy.y) + ") R(" +
+							to_string(bodies[i].body.skeleton.joints[j].orientation.wxyz.x) + "," +
+							to_string(bodies[i].body.skeleton.joints[j].orientation.wxyz.y) + "," +
+							to_string(bodies[i].body.skeleton.joints[j].orientation.wxyz.z) + "," +
+							to_string(bodies[i].body.skeleton.joints[j].orientation.wxyz.w) + ")"
 							).c_str());
 					}
 				}

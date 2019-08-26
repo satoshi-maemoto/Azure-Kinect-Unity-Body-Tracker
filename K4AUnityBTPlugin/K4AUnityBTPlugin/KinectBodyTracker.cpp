@@ -51,6 +51,7 @@ void KinectBodyTracker::Start()
 			int colorImageHeight = -1;
 			k4a_image_t transformedDepthImage = nullptr;
 			auto transformation = k4a_transformation_create(&calibration);
+			int validCalibratedPoint;
 
 			do
 			{
@@ -133,11 +134,17 @@ void KinectBodyTracker::Start()
 					if (k4abt_tracker_pop_result(this->tracker, &bodyFrame, 0) == K4A_WAIT_RESULT_SUCCEEDED)
 					{
 						auto numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-						memset(this->bodies, 0, sizeof(k4abt_body_t) * K4ABT_MAX_BODY);
+						memset(this->bodies, 0, sizeof(Body) * K4ABT_MAX_BODY);
 						for (auto i = 0; i < numBodies; ++i)
 						{
-							this->bodies[i].id = k4abt_frame_get_body_id(bodyFrame, i);
-							k4abt_frame_get_body_skeleton(bodyFrame, i, &this->bodies[i].skeleton);
+							this->bodies[i].body.id = k4abt_frame_get_body_id(bodyFrame, i);
+							k4abt_frame_get_body_skeleton(bodyFrame, i, &this->bodies[i].body.skeleton);
+							for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
+							{
+								k4a_calibration_3d_to_2d(&calibration, &this->bodies[i].body.skeleton.joints[j].position,
+									K4A_CALIBRATION_TYPE_DEPTH, K4A_CALIBRATION_TYPE_COLOR,
+									&this->bodies[i].calibratedJointPoints[j], &validCalibratedPoint);
+							}
 						}
 						k4abt_frame_release(bodyFrame);
 					}
