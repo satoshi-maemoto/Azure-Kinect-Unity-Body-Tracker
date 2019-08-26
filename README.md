@@ -22,7 +22,9 @@ Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 
 * dnn_model.onnx
 * onnxruntime.dll
-
+* cublas64_100.dll
+* cudart64_100.dll
+* cudnn64_7.dll
 
 下記ファイルを Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUnityBT\Plugins\x86_64 配下に配置してください。
 
