@@ -53,3 +53,6 @@ MonoBehaviour:
   - {fileID: 2100000, guid: 743c6732f4e38744eab5e415255075af, type: 2}
   jointPrefab: {fileID: 7396959467056248150, guid: 654534f323093b744820b5166fda5bb1,
     type: 3}
+  calibratedJointPrefab: {fileID: 896078283469259079, guid: caa6b3426ff381e4e866062c5272c075,
+    type: 3}
+  IsMirror: 1

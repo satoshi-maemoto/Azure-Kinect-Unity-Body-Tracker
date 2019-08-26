@@ -290,6 +290,11 @@ PrefabInstance:
       propertyPath: bodyIndex
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 5471771006490897157, guid: 1a6e8588467359a41ab36600f70f86ea,
+        type: 3}
+      propertyPath: colorQuad
+      value: 
+      objectReference: {fileID: 1802447683}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a6e8588467359a41ab36600f70f86ea, type: 3}
 --- !u!4 &667469731 stripped
@@ -470,6 +475,11 @@ PrefabInstance:
       propertyPath: bodyIndex
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 5471771006490897157, guid: 1a6e8588467359a41ab36600f70f86ea,
+        type: 3}
+      propertyPath: colorQuad
+      value: 
+      objectReference: {fileID: 1802447683}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a6e8588467359a41ab36600f70f86ea, type: 3}
 --- !u!4 &925245774 stripped
@@ -621,6 +631,11 @@ PrefabInstance:
       propertyPath: bodyIndex
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 5471771006490897157, guid: 1a6e8588467359a41ab36600f70f86ea,
+        type: 3}
+      propertyPath: colorQuad
+      value: 
+      objectReference: {fileID: 1802447683}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a6e8588467359a41ab36600f70f86ea, type: 3}
 --- !u!4 &1261285016 stripped
@@ -769,6 +784,11 @@ PrefabInstance:
       propertyPath: bodyIndex
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 5471771006490897157, guid: 1a6e8588467359a41ab36600f70f86ea,
+        type: 3}
+      propertyPath: colorQuad
+      value: 
+      objectReference: {fileID: 1802447683}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a6e8588467359a41ab36600f70f86ea, type: 3}
 --- !u!4 &1355201782 stripped
@@ -866,6 +886,11 @@ PrefabInstance:
       propertyPath: bodyIndex
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 5471771006490897157, guid: 1a6e8588467359a41ab36600f70f86ea,
+        type: 3}
+      propertyPath: colorQuad
+      value: 
+      objectReference: {fileID: 1802447683}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a6e8588467359a41ab36600f70f86ea, type: 3}
 --- !u!4 &1559358785 stripped
@@ -1266,5 +1291,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5471771006490897157, guid: 1a6e8588467359a41ab36600f70f86ea,
+        type: 3}
+      propertyPath: colorQuad
+      value: 
+      objectReference: {fileID: 1802447683}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1a6e8588467359a41ab36600f70f86ea, type: 3}

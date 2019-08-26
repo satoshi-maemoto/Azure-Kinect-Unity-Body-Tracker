@@ -93,7 +93,7 @@ __declspec(dllexport) bool K4ABT_End()
 
 bool K4ABT_GetBodies(void* buffer, int length)
 {
-	memcpy(buffer, tracker->bodies, sizeof(k4abt_body_t) * length);
+	memcpy(buffer, tracker->bodies, sizeof(KinectBodyTracker::Body) * length);
 	return true;
 }
 
