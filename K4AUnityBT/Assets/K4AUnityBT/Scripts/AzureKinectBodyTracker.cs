@@ -75,6 +75,7 @@ namespace AzureKinect.Unity.BodyTracker
     public static class AzureKinectBodyTracker
     {
         public const int MaxBody = 6;
+        public static int BodyBufferSize = Marshal.SizeOf(typeof(Body));
 
         private static bool IsValidPlatform()
         {
@@ -93,12 +94,12 @@ namespace AzureKinect.Unity.BodyTracker
         public delegate void DebugLogDelegate(string message);
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern void K4ABT_SetDebugLogFunction(IntPtr fp);
-        public static void SetDebugLogFunction(IntPtr fp)
+        private static extern void K4ABT_SetDebugLogCallback(IntPtr callback);
+        public static void SetDebugLogCallback(IntPtr callback)
         {
             if (IsValidPlatform())
             {
-                K4ABT_SetDebugLogFunction(fp);
+                K4ABT_SetDebugLogCallback(callback);
             }
         }
 
@@ -137,7 +138,7 @@ namespace AzureKinect.Unity.BodyTracker
         {
             if (IsValidPlatform())
             {
-                SetDebugLogFunction(IntPtr.Zero);
+                SetDebugLogCallback(IntPtr.Zero);
                 if (!K4ABT_End())
                 {
                     throw new K4ABTException(GetLastErrorMessage());
@@ -145,27 +146,32 @@ namespace AzureKinect.Unity.BodyTracker
             }
         }
 
-        private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
-        private static int bodiesBufferSize = bodyBufferSize * MaxBody;
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void BodyRecognizedDelegate(IntPtr buffer, uint bufferSize);
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_GetBodies(IntPtr buffer, uint bufferSize);
-        public static Body[] GetBodies()
+        private static extern void K4ABT_SetBodyRecognizedCallback(IntPtr callback);
+        public static void SetBodyRecognizedCallback(IntPtr callback)
+        {
+            if (IsValidPlatform())
+            {
+                K4ABT_SetBodyRecognizedCallback(callback);
+            }
+        }
+
+        public static void DefaultBodyRecognizedCallback(IntPtr buffer, uint bufferSize)
         {
             var result = new Body[MaxBody];
             if (IsValidPlatform())
             {
-                var allocatedMemory = Marshal.AllocHGlobal(bodiesBufferSize);
-                K4ABT_GetBodies(allocatedMemory, MaxBody);
-                var p = allocatedMemory;
+                var p = buffer;
                 for (int i = 0; i < MaxBody; i++)
                 {
                     result[i] = (Body)Marshal.PtrToStructure(p, typeof(Body));
-                    p += bodyBufferSize;
+                    p += BodyBufferSize;
                 }
-                Marshal.FreeHGlobal(allocatedMemory);
             }
-            return result;
         }
     }
 

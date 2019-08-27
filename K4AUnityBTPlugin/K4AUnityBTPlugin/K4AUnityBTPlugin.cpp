@@ -2,14 +2,14 @@
 #include "pch.h"
 #include "K4AUnityBTPlugin.h"
 #include "Utils.h"
-#include "KinectBodyTracker.h"
 
-static DebugLogFuncPtr debugPrintFunction = nullptr;
+static DebugLogCallbackPtr debugLogCallback = nullptr;
 static string lastErrorMessage = string();
 static KinectBodyTracker* tracker = nullptr;
 static unsigned int outputDepthTextureId = 0;
 static unsigned int outputColorTextureId = 0;
 static unsigned int outputTransformedDepthTextureId = 0;
+static BodyRecognizedCallbackPtr bodyRecognizedCallback = nullptr;
 
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -30,16 +30,20 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 void DebugLog(const char* message)
 {
-	if (debugPrintFunction != nullptr)
+	if (debugLogCallback != nullptr)
 	{
-		debugPrintFunction(message);
+		debugLogCallback(message);
 	}
 	printf("%s\n", message);
 }
 
-void K4ABT_SetDebugLogFunction(DebugLogFuncPtr fp)
+void K4ABT_SetDebugLogCallback(DebugLogCallbackPtr callback)
 {
-	debugPrintFunction = fp;
+	debugLogCallback = callback;
+	if (tracker != nullptr)
+	{
+		tracker->SetDebugLogCallback(debugLogCallback);
+	}
 }
 
 __declspec(dllexport) void K4ABT_GetLastErrorMessage(LPWSTR buffer, DWORD bufferSize)
@@ -57,7 +61,8 @@ __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int
 		if (tracker == nullptr)
 		{
 			tracker = new KinectBodyTracker();
-			tracker->SetDebugLogFunction(debugPrintFunction);
+			tracker->SetDebugLogCallback(debugLogCallback);
+			tracker->SetBodyRecognizedCallback(bodyRecognizedCallback);
 		}
 		outputDepthTextureId = depthTextureId;
 		outputColorTextureId = coloTextureId;
@@ -80,9 +85,12 @@ __declspec(dllexport) bool K4ABT_End()
 
 	if (tracker != nullptr)
 	{
-		tracker->Stop();
-		delete tracker;
-		tracker = nullptr;
+		if (tracker != nullptr)
+		{
+			tracker->Stop();
+			delete tracker;
+			tracker = nullptr;
+		}
 
 		outputDepthTextureId = 0;
 		outputColorTextureId = 0;
@@ -91,10 +99,13 @@ __declspec(dllexport) bool K4ABT_End()
 	return true;
 }
 
-bool K4ABT_GetBodies(void* buffer, int length)
+void K4ABT_SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback)
 {
-	memcpy(buffer, tracker->bodies, sizeof(KinectBodyTracker::Body) * length);
-	return true;
+	bodyRecognizedCallback = callback;
+	if (tracker != nullptr)
+	{
+		tracker->SetBodyRecognizedCallback(bodyRecognizedCallback);
+	}
 }
 
 void OnTextureUpdate(int eventId, void* pData)

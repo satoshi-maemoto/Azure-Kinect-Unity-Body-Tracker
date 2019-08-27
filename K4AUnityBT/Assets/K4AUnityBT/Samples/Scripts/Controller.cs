@@ -17,22 +17,54 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private Texture2D colorTexture;
         private Texture2D transformedDepthTexture;
         private CommandBuffer commandBuffer;
+        private Body[] bodies = new Body[AzureKinectBodyTracker.MaxBody];
 
-        static void PluginDebugCallBack(string message)
+
+        static void PluginDebugLogCallBack(string message)
         {
             Debug.Log("K4ABT : " + message);
         }
 
         void Start()
         {
+            Debug.Log($"Body Size : {AzureKinectBodyTracker.BodyBufferSize}");
+
             this.commandBuffer = new CommandBuffer();
             this.commandBuffer.name = "AzureKinectImagesUpdeate";
 
-            var debugDelegate = new AzureKinectBodyTracker.DebugLogDelegate(PluginDebugCallBack);
-            var functionPointer = Marshal.GetFunctionPointerForDelegate(debugDelegate);
-            AzureKinectBodyTracker.SetDebugLogFunction(functionPointer);
+            var debugDelegate = new AzureKinectBodyTracker.DebugLogDelegate(PluginDebugLogCallBack);
+            var debagCallback = Marshal.GetFunctionPointerForDelegate(debugDelegate);
+            AzureKinectBodyTracker.SetDebugLogCallback(debagCallback);
+
+            var bodyRecognizedDelegate = new AzureKinectBodyTracker.BodyRecognizedDelegate(this.BodyRecognizedCallback);
+            var bodyRecognizedCallback = Marshal.GetFunctionPointerForDelegate(bodyRecognizedDelegate);
+            AzureKinectBodyTracker.SetBodyRecognizedCallback(bodyRecognizedCallback);
 
             this.StartCoroutine(this.Process());
+        }
+
+        [DllImport("kernel32.dll")]
+        static extern void CopyMemory(IntPtr dst, IntPtr src, int size);
+
+        private void BodyRecognizedCallback(IntPtr buffer, uint bufferSize)
+        {
+            //Debug.Log($"bufferSize : {bufferSize}");
+            //Body[] tmpBodies = new Body[AzureKinectBodyTracker.MaxBody];
+            //GCHandle gch = GCHandle.Alloc(tmpBodies, GCHandleType.Pinned);
+            //CopyMemory(gch.AddrOfPinnedObject(), buffer, (int)bufferSize);
+            //this.bodies = (Body[])gch.Target;
+            //gch.Free();
+
+            //ar buffer_ptr = Marshal.AllocHGlobal(totalSize);
+            var p = buffer;
+            for (int i = 0; i < AzureKinectBodyTracker.MaxBody; i++)
+            {
+                if (p != IntPtr.Zero)
+                {
+                    this.bodies[i] = Marshal.PtrToStructure<Body>(p);
+                }
+                p += AzureKinectBodyTracker.BodyBufferSize;
+            }
         }
 
         private IEnumerator Process()
@@ -53,11 +85,10 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
 
             AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId);
-            var startedTime = Time.realtimeSinceStartup;
+            //var startedTime = Time.realtimeSinceStartup;
             while (true)
             {
-                var bodies = AzureKinectBodyTracker.GetBodies();
-                for (var i = 0; i < bodies.Length; i++)
+                for (var i = 0; i < this.bodies.Length; i++)
                 {
                     this.bodyVisualizers[i].Apply(bodies[i], i);
                 }
