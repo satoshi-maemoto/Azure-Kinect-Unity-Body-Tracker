@@ -32,7 +32,6 @@ void KinectBodyTracker::Start()
 	Verify(k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
 		"Get depth camera calibration failed!");
 
-	this->tracker = nullptr;
 	Verify(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
 
 
@@ -41,7 +40,6 @@ void KinectBodyTracker::Start()
 	this->transformedDepth = nullptr;
 
 	this->isRunning = true;
-
 	this->workerThread = thread([this, calibration]()
 		{
 			size_t depthImageSize = -1;
@@ -147,9 +145,19 @@ void KinectBodyTracker::Start()
 							}
 						}
 						k4abt_frame_release(bodyFrame);
+
+						if (this->bodyRecognizedCallback != nullptr)
+						{
+							this->bodyRecognizedCallback(numBodies);
+						}
 					}
 				}
 			} while (this->isRunning);
+
+			if (this->tracker != nullptr)
+			{
+				k4abt_tracker_shutdown(this->tracker);
+			}
 
 			if (transformedDepthImage != nullptr)
 			{
@@ -160,6 +168,22 @@ void KinectBodyTracker::Start()
 				k4a_transformation_destroy(transformation);
 			}
 
+			if (this->depth != nullptr)
+			{
+				free(this->depth);
+				this->depth = nullptr;
+			}
+			if (this->color != nullptr)
+			{
+				free(this->color);
+				this->color = nullptr;
+			}
+			if (this->transformedDepth != nullptr)
+			{
+				free(this->transformedDepth);
+				this->transformedDepth = nullptr;
+			}
+
 			this->DebugLog("Finished worker thread\n");
 		}
 	);
@@ -168,30 +192,41 @@ void KinectBodyTracker::Start()
 void KinectBodyTracker::Stop()
 {
 	this->isRunning = false;
-	k4abt_tracker_shutdown(this->tracker);
-	this->workerThread.join();
+	if (this->workerThread.joinable())
+	{
+		this->workerThread.join();
+	}
 
-	free(this->depth);
-	free(this->color);
-	free(this->transformedDepth);
-
-	k4abt_tracker_destroy(this->tracker);
-	k4a_device_stop_cameras(this->device);
-	k4a_device_close(this->device);
+	if (this->tracker != nullptr)
+	{
+		k4abt_tracker_destroy(this->tracker);
+		this->tracker = nullptr;
+	}
+	if (this->device != nullptr)
+	{
+		k4a_device_stop_cameras(this->device);
+		k4a_device_close(this->device);
+		this->device = nullptr;
+	}
 
 	this->DebugLog("Finished body tracking processing!\n");
 }
 
-void KinectBodyTracker::SetDebugLogFunction(DebugLogFuncPtr fp)
+void KinectBodyTracker::SetDebugLogCallback(DebugLogCallbackPtr callback)
 {
-	this->debugPrintFunction = fp;
+	this->debugLogCallback = callback;
 }
 
 void KinectBodyTracker::DebugLog(const char* message)
 {
-	if (this->debugPrintFunction != nullptr)
+	if (this->debugLogCallback != nullptr)
 	{
-		this->debugPrintFunction(message);
+		this->debugLogCallback(message);
 	}
 	printf("%s\n", message);
+}
+
+void KinectBodyTracker::SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback)
+{
+	this->bodyRecognizedCallback = callback;
 }
