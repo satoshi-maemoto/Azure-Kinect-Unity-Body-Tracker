@@ -150,14 +150,14 @@ namespace AzureKinect.Unity.BodyTracker
         private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_GetBodies(IntPtr buffer, int numBodies);
+        private static extern bool K4ABT_GetBody(IntPtr buffer, int numBodies);
         public static Body[] GetBody(int numBodies)
         {
             var result = new Body[numBodies];
             if (IsValidPlatform())
             {
                 var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * numBodies);
-                K4ABT_GetBodies(allocatedMemory, numBodies);
+                K4ABT_GetBody(allocatedMemory, numBodies);
                 var p = allocatedMemory;
                 for (int i = 0; i < numBodies; i++)
                 {
@@ -179,6 +179,16 @@ namespace AzureKinect.Unity.BodyTracker
             if (IsValidPlatform())
             {
                 K4ABT_SetBodyRecognizedCallback(callback);
+            }
+        }
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern void K4ABT_SetCalibratedJointPointAvailability(bool availability);
+        public static void SetCalibratedJointPointAvailability(bool availability)
+        {
+            if (IsValidPlatform())
+            {
+                K4ABT_SetCalibratedJointPointAvailability(availability);
             }
         }
     }

@@ -99,7 +99,7 @@ __declspec(dllexport) bool K4ABT_End()
 	return true;
 }
 
-bool K4ABT_GetBodies(void* buffer, int numBodies)
+bool K4ABT_GetBody(void* buffer, int numBodies)
 {
 	if (numBodies > K4ABT_MAX_BODY)
 	{
@@ -115,6 +115,14 @@ void K4ABT_SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback)
 	if (tracker != nullptr)
 	{
 		tracker->SetBodyRecognizedCallback(bodyRecognizedCallback);
+	}
+}
+
+void K4ABT_SetCalibratedJointPointAvailability(bool availability)
+{
+	if (tracker != nullptr)
+	{
+		tracker->SetCalibratedJointPointAvailability(availability);
 	}
 }
 

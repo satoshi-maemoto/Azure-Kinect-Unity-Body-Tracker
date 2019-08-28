@@ -137,11 +137,14 @@ void KinectBodyTracker::Start()
 						{
 							this->bodies[i].body.id = k4abt_frame_get_body_id(bodyFrame, i);
 							k4abt_frame_get_body_skeleton(bodyFrame, i, &this->bodies[i].body.skeleton);
-							for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
+							if (this->calibratedJointPointAvailability)
 							{
-								k4a_calibration_3d_to_2d(&calibration, &this->bodies[i].body.skeleton.joints[j].position,
-									K4A_CALIBRATION_TYPE_DEPTH, K4A_CALIBRATION_TYPE_COLOR,
-									&this->bodies[i].calibratedJointPoints[j], &validCalibratedPoint);
+								for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
+								{
+									k4a_calibration_3d_to_2d(&calibration, &this->bodies[i].body.skeleton.joints[j].position,
+										K4A_CALIBRATION_TYPE_DEPTH, K4A_CALIBRATION_TYPE_COLOR,
+										&this->bodies[i].calibratedJointPoints[j], &validCalibratedPoint);
+								}
 							}
 						}
 						k4abt_frame_release(bodyFrame);
@@ -229,4 +232,9 @@ void KinectBodyTracker::DebugLog(const char* message)
 void KinectBodyTracker::SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback)
 {
 	this->bodyRecognizedCallback = callback;
+}
+
+void KinectBodyTracker::SetCalibratedJointPointAvailability(bool availability)
+{
+	this->calibratedJointPointAvailability = availability;
 }
