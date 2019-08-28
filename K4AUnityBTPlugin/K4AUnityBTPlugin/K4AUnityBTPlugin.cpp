@@ -99,6 +99,16 @@ __declspec(dllexport) bool K4ABT_End()
 	return true;
 }
 
+bool K4ABT_GetBodies(void* buffer, int numBodies)
+{
+	if (numBodies > K4ABT_MAX_BODY)
+	{
+		return false;
+	}
+	memcpy(buffer, tracker->bodies, sizeof(KinectBodyTracker::Body) * numBodies);
+	return true;
+}
+
 void K4ABT_SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback)
 {
 	bodyRecognizedCallback = callback;

@@ -19,10 +19,12 @@ namespace K4AUnityBTPluginTest
 			Logger::WriteMessage(message);
 		}
 
-		static void BodyRecognized(void* buffer, int length)
+		static void BodyRecognized(int numBodies)
 		{
-			KinectBodyTracker::Body* bodies = (KinectBodyTracker::Body*)buffer;
- 			for (auto i = 0; i < K4ABT_MAX_BODY; i++)
+			KinectBodyTracker::Body bodies[K4ABT_MAX_BODY];
+			K4ABT_GetBodies(bodies, numBodies);
+
+ 			for (auto i = 0; i < numBodies; i++)
 			{
 				for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
 				{

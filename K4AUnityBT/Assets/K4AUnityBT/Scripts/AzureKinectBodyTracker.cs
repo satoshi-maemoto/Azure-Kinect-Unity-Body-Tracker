@@ -70,12 +70,13 @@ namespace AzureKinect.Unity.BodyTracker
                 return ((this.body.id > 0) && (this.body.skeleton.joints != null) && (this.body.skeleton.joints.Length > 0));
             }
         }
+
+        public static Body Empty = new Body();
     };
 
     public static class AzureKinectBodyTracker
     {
         public const int MaxBody = 6;
-        public static int BodyBufferSize = Marshal.SizeOf(typeof(Body));
 
         private static bool IsValidPlatform()
         {
@@ -146,9 +147,30 @@ namespace AzureKinect.Unity.BodyTracker
             }
         }
 
+        private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern bool K4ABT_GetBodies(IntPtr buffer, int numBodies);
+        public static Body[] GetBody(int numBodies)
+        {
+            var result = new Body[numBodies];
+            if (IsValidPlatform())
+            {
+                var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * numBodies);
+                K4ABT_GetBodies(allocatedMemory, numBodies);
+                var p = allocatedMemory;
+                for (int i = 0; i < numBodies; i++)
+                {
+                    result[i] = Marshal.PtrToStructure<Body>(p);
+                    p += bodyBufferSize;
+                }
+                Marshal.FreeHGlobal(allocatedMemory);
+            }
+            return result;
+        }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void BodyRecognizedDelegate(IntPtr buffer, uint bufferSize);
+        public delegate void BodyRecognizedDelegate(int numBodies);
 
         [DllImport("K4AUnityBTPlugin")]
         private static extern void K4ABT_SetBodyRecognizedCallback(IntPtr callback);
@@ -157,20 +179,6 @@ namespace AzureKinect.Unity.BodyTracker
             if (IsValidPlatform())
             {
                 K4ABT_SetBodyRecognizedCallback(callback);
-            }
-        }
-
-        public static void DefaultBodyRecognizedCallback(IntPtr buffer, uint bufferSize)
-        {
-            var result = new Body[MaxBody];
-            if (IsValidPlatform())
-            {
-                var p = buffer;
-                for (int i = 0; i < MaxBody; i++)
-                {
-                    result[i] = (Body)Marshal.PtrToStructure(p, typeof(Body));
-                    p += BodyBufferSize;
-                }
             }
         }
     }

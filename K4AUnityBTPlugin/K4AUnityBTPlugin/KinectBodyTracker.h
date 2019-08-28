@@ -6,7 +6,7 @@
 #define K4ABT_MAX_BODY 6
 
 typedef void(*DebugLogCallbackPtr)(const char*);
-typedef void(*BodyRecognizedCallbackPtr)(void* buffer, int length);
+typedef void(*BodyRecognizedCallbackPtr)(int numBodies);
 
 class KinectBodyTracker
 {
@@ -22,6 +22,7 @@ public:
 	void SetDebugLogCallback(DebugLogCallbackPtr callback);
 	void SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
 
+	Body bodies[K4ABT_MAX_BODY];
 	unsigned long* color = nullptr;
 	uint64_t colorTimestamp;
 	unsigned short* depth = nullptr;

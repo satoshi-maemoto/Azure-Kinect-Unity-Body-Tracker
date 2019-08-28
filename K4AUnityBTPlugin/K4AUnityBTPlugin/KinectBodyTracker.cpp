@@ -50,7 +50,6 @@ void KinectBodyTracker::Start()
 			k4a_image_t transformedDepthImage = nullptr;
 			auto transformation = k4a_transformation_create(&calibration);
 			int validCalibratedPoint;
-			Body bodies[K4ABT_MAX_BODY];
 
 			do
 			{
@@ -133,23 +132,23 @@ void KinectBodyTracker::Start()
 					if (k4abt_tracker_pop_result(this->tracker, &bodyFrame, 0) == K4A_WAIT_RESULT_SUCCEEDED)
 					{
 						auto numBodies = k4abt_frame_get_num_bodies(bodyFrame);
-						memset(bodies, 0, sizeof(Body) * K4ABT_MAX_BODY);
+						memset(this->bodies, 0, sizeof(Body) * K4ABT_MAX_BODY);
 						for (auto i = 0; i < numBodies; ++i)
 						{
-							bodies[i].body.id = k4abt_frame_get_body_id(bodyFrame, i);
-							k4abt_frame_get_body_skeleton(bodyFrame, i, &bodies[i].body.skeleton);
+							this->bodies[i].body.id = k4abt_frame_get_body_id(bodyFrame, i);
+							k4abt_frame_get_body_skeleton(bodyFrame, i, &this->bodies[i].body.skeleton);
 							for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
 							{
-								k4a_calibration_3d_to_2d(&calibration, &bodies[i].body.skeleton.joints[j].position,
+								k4a_calibration_3d_to_2d(&calibration, &this->bodies[i].body.skeleton.joints[j].position,
 									K4A_CALIBRATION_TYPE_DEPTH, K4A_CALIBRATION_TYPE_COLOR,
-									&bodies[i].calibratedJointPoints[j], &validCalibratedPoint);
+									&this->bodies[i].calibratedJointPoints[j], &validCalibratedPoint);
 							}
 						}
 						k4abt_frame_release(bodyFrame);
 
 						if (this->bodyRecognizedCallback != nullptr)
 						{
-							this->bodyRecognizedCallback(bodies, sizeof(Body) * K4ABT_MAX_BODY);
+							this->bodyRecognizedCallback(numBodies);
 						}
 					}
 				}

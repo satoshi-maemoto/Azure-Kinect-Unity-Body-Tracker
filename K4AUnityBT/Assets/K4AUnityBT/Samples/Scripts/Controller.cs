@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 namespace AzureKinect.Unity.BodyTracker.Sample
 {
@@ -12,13 +14,18 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         public Material depthMaterial;
         public Material colorMaterial;
         public Material transformedDepthMaterial;
+        public Text bodyFps;
 
         private Texture2D depthTexture;
         private Texture2D colorTexture;
         private Texture2D transformedDepthTexture;
         private CommandBuffer commandBuffer;
-        private Body[] bodies = new Body[AzureKinectBodyTracker.MaxBody];
+        private SynchronizationContext syncContext;
+        private int bodyFrameCount = 0;
+        private float fpsMeasured = 0f;
 
+
+        private static Controller self;
 
         static void PluginDebugLogCallBack(string message)
         {
@@ -27,7 +34,8 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         void Start()
         {
-            Debug.Log($"Body Size : {AzureKinectBodyTracker.BodyBufferSize}");
+            self = this;
+            this.syncContext = SynchronizationContext.Current;
 
             this.commandBuffer = new CommandBuffer();
             this.commandBuffer.name = "AzureKinectImagesUpdeate";
@@ -46,24 +54,25 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         [DllImport("kernel32.dll")]
         static extern void CopyMemory(IntPtr dst, IntPtr src, int size);
 
-        private void BodyRecognizedCallback(IntPtr buffer, uint bufferSize)
+        private void BodyRecognizedCallback(int numBodies)
         {
-            //Debug.Log($"bufferSize : {bufferSize}");
-            //Body[] tmpBodies = new Body[AzureKinectBodyTracker.MaxBody];
-            //GCHandle gch = GCHandle.Alloc(tmpBodies, GCHandleType.Pinned);
-            //CopyMemory(gch.AddrOfPinnedObject(), buffer, (int)bufferSize);
-            //this.bodies = (Body[])gch.Target;
-            //gch.Free();
-
-            //ar buffer_ptr = Marshal.AllocHGlobal(totalSize);
-            var p = buffer;
-            for (int i = 0; i < AzureKinectBodyTracker.MaxBody; i++)
+            try
             {
-                if (p != IntPtr.Zero)
+                self.bodyFrameCount++;
+
+                var bodies = AzureKinectBodyTracker.GetBody(numBodies);
+
+                self.syncContext.Post((s) =>
                 {
-                    this.bodies[i] = Marshal.PtrToStructure<Body>(p);
-                }
-                p += AzureKinectBodyTracker.BodyBufferSize;
+                    for (var i = 0; i < AzureKinectBodyTracker.MaxBody; i++)
+                    {
+                        self.bodyVisualizers[i].Apply((i < bodies.Length) ? bodies[i] : Body.Empty, i);
+                    }
+                }, null);
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"{e.GetType().Name}\n{e.Message}\n{e.StackTrace}");
             }
         }
 
@@ -85,17 +94,9 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             this.commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
 
             AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId);
-            //var startedTime = Time.realtimeSinceStartup;
             while (true)
             {
-                for (var i = 0; i < this.bodies.Length; i++)
-                {
-                    this.bodyVisualizers[i].Apply(bodies[i], i);
-                }
-
                 Graphics.ExecuteCommandBuffer(this.commandBuffer);
-                //Debug.Log($"Update Timestamp: {(Time.realtimeSinceStartup - startedTime)}");
-
                 yield return null;
             }
         }
@@ -104,6 +105,18 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         {
             this.StopAllCoroutines();
             AzureKinectBodyTracker.End();
+        }
+
+        private void Update()
+        {
+            this.fpsMeasured += Time.deltaTime;
+            if (this.fpsMeasured >= 1.0f)
+            {
+                var fps = this.bodyFrameCount / this.fpsMeasured;
+                this.bodyFps.text = $"Body FPS : {fps}";
+                this.fpsMeasured = 0;
+                this.bodyFrameCount = 0;
+            }
         }
     }
 }
