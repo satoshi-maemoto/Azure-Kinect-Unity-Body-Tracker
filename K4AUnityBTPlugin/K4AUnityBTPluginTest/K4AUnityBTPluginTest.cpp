@@ -22,7 +22,7 @@ namespace K4AUnityBTPluginTest
 		static void BodyRecognized(int numBodies)
 		{
 			KinectBodyTracker::Body bodies[K4ABT_MAX_BODY];
-			K4ABT_GetBodies(bodies, numBodies);
+			K4ABT_GetBody(bodies, numBodies);
 
  			for (auto i = 0; i < numBodies; i++)
 			{
