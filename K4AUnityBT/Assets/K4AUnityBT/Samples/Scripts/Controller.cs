@@ -51,9 +51,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             this.StartCoroutine(this.Process());
         }
 
-        [DllImport("kernel32.dll")]
-        static extern void CopyMemory(IntPtr dst, IntPtr src, int size);
-
         private void BodyRecognizedCallback(int numBodies)
         {
             try
@@ -117,6 +114,11 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 this.fpsMeasured = 0;
                 this.bodyFrameCount = 0;
             }
+        }
+
+        public void CalibratedJointPointToggleValueChanged(bool value)
+        {
+            AzureKinectBodyTracker.SetCalibratedJointPointAvailability(value);
         }
     }
 }

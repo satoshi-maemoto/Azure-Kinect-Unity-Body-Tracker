@@ -21,6 +21,7 @@ public:
 	void Stop();
 	void SetDebugLogCallback(DebugLogCallbackPtr callback);
 	void SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
+	void SetCalibratedJointPointAvailability(bool availability);
 
 	Body bodies[K4ABT_MAX_BODY];
 	unsigned long* color = nullptr;
@@ -39,5 +40,6 @@ private:
 	std::thread workerThread;
 	DebugLogCallbackPtr debugLogCallback = nullptr;
 	BodyRecognizedCallbackPtr bodyRecognizedCallback = nullptr;
+	bool calibratedJointPointAvailability = true;
 };
 
