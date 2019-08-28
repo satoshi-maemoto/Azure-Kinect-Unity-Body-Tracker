@@ -56,76 +56,11 @@ void KinectBodyTracker::Start()
 				k4a_capture_t capture;
 				if (k4a_device_get_capture(this->device, &capture, 0) == K4A_WAIT_RESULT_SUCCEEDED)
 				{
-					auto colorImage = k4a_capture_get_color_image(capture);
-					if (colorImage != nullptr)
+					auto queueCaptureResult = k4abt_tracker_enqueue_capture(this->tracker, capture, 0);
+					k4a_capture_release(capture);
+					if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
 					{
-						if (colorImageSize == -1)
-						{
-							colorImageSize = k4a_image_get_size(colorImage);
-							colorImageWidth = k4a_image_get_width_pixels(colorImage);
-							colorImageHeight = k4a_image_get_height_pixels(colorImage);
-						}
-						if (this->color == nullptr)
-						{
-							this->color = (unsigned long*)malloc(colorImageSize);
-						}
-						if (this->color != nullptr)
-						{
-							memcpy(this->color, k4a_image_get_buffer(colorImage), colorImageSize);
-							this->colorTimestamp = k4a_image_get_device_timestamp_usec(colorImage);
-						}
-						k4a_image_release(colorImage);
-					}
-
-					auto depthImage = k4a_capture_get_depth_image(capture);
-					if (depthImage != nullptr)
-					{
-						if (depthImageSize == -1)
-						{
-							depthImageSize = k4a_image_get_size(depthImage);
-						}
-						if (this->depth == nullptr)
-						{
-							this->depth = (unsigned short*)malloc(depthImageSize);
-						}
-						if (this->depth != nullptr)
-						{
-							memcpy(this->depth, k4a_image_get_buffer(depthImage), depthImageSize);
-							this->depthTimestamp = k4a_image_get_device_timestamp_usec(depthImage);
-						}
-
-						if ((transformedDepthImage == nullptr) && ((colorImageWidth != -1) && (colorImageHeight != -1)))
-						{
-							k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, colorImageWidth, colorImageHeight, colorImageWidth * (int)sizeof(uint16_t), &transformedDepthImage);
-						}
-						if (transformedDepthImage != nullptr)
-						{
-							if (k4a_transformation_depth_image_to_color_camera(transformation, depthImage, transformedDepthImage) == K4A_RESULT_SUCCEEDED)
-							{
-								if (transformedDepthSize == -1)
-								{
-									transformedDepthSize = k4a_image_get_size(transformedDepthImage);
-								}
-								if (this->transformedDepth == nullptr)
-								{
-									this->transformedDepth = (unsigned short*)malloc(transformedDepthSize);
-								}
-								if (this->transformedDepth != nullptr)
-								{
-									memcpy(this->transformedDepth, k4a_image_get_buffer(transformedDepthImage), transformedDepthSize);
-									this->transformedDepthTimestamp = k4a_image_get_device_timestamp_usec(transformedDepthImage);
-								}
-							}
-						}
-
-						auto queueCaptureResult = k4abt_tracker_enqueue_capture(this->tracker, capture, 0);
-						k4a_capture_release(capture);
-						if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
-						{
-							this->DebugLog("Error! Add capture to tracker process queue failed!\n");
-						}
-
-						k4a_image_release(depthImage);
+						this->DebugLog("Error! Add capture to tracker process queue failed!\n");
 					}
 
 					k4abt_frame_t bodyFrame = nullptr;
@@ -147,6 +82,72 @@ void KinectBodyTracker::Start()
 								}
 							}
 						}
+
+						auto capture = k4abt_frame_get_capture(bodyFrame);
+						auto colorImage = k4a_capture_get_color_image(capture);
+						if (colorImage != nullptr)
+						{
+							if (colorImageSize == -1)
+							{
+								colorImageSize = k4a_image_get_size(colorImage);
+								colorImageWidth = k4a_image_get_width_pixels(colorImage);
+								colorImageHeight = k4a_image_get_height_pixels(colorImage);
+							}
+							if (this->color == nullptr)
+							{
+								this->color = (unsigned long*)malloc(colorImageSize);
+							}
+							if (this->color != nullptr)
+							{
+								memcpy(this->color, k4a_image_get_buffer(colorImage), colorImageSize);
+								this->colorTimestamp = k4a_image_get_device_timestamp_usec(colorImage);
+							}
+							k4a_image_release(colorImage);
+						}
+
+						auto depthImage = k4a_capture_get_depth_image(capture);
+						if (depthImage != nullptr)
+						{
+							if (depthImageSize == -1)
+							{
+								depthImageSize = k4a_image_get_size(depthImage);
+							}
+							if (this->depth == nullptr)
+							{
+								this->depth = (unsigned short*)malloc(depthImageSize);
+							}
+							if (this->depth != nullptr)
+							{
+								memcpy(this->depth, k4a_image_get_buffer(depthImage), depthImageSize);
+								this->depthTimestamp = k4a_image_get_device_timestamp_usec(depthImage);
+							}
+
+							if ((transformedDepthImage == nullptr) && ((colorImageWidth != -1) && (colorImageHeight != -1)))
+							{
+								k4a_image_create(K4A_IMAGE_FORMAT_DEPTH16, colorImageWidth, colorImageHeight, colorImageWidth * (int)sizeof(uint16_t), &transformedDepthImage);
+							}
+							if (transformedDepthImage != nullptr)
+							{
+								if (k4a_transformation_depth_image_to_color_camera(transformation, depthImage, transformedDepthImage) == K4A_RESULT_SUCCEEDED)
+								{
+									if (transformedDepthSize == -1)
+									{
+										transformedDepthSize = k4a_image_get_size(transformedDepthImage);
+									}
+									if (this->transformedDepth == nullptr)
+									{
+										this->transformedDepth = (unsigned short*)malloc(transformedDepthSize);
+									}
+									if (this->transformedDepth != nullptr)
+									{
+										memcpy(this->transformedDepth, k4a_image_get_buffer(transformedDepthImage), transformedDepthSize);
+										this->transformedDepthTimestamp = k4a_image_get_device_timestamp_usec(transformedDepthImage);
+									}
+								}
+							}
+							k4a_image_release(depthImage);
+						}
+
 						k4abt_frame_release(bodyFrame);
 
 						if (this->bodyRecognizedCallback != nullptr)
