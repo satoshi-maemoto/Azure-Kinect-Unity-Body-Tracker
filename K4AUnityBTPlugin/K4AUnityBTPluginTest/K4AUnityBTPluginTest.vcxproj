@@ -110,7 +110,6 @@
     <PostBuildEvent>
       <Command>copy "$(AzureKinectSDK)tools\depthengine_2_0.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\dnn_model.onnx" $(OutDir)
-copy "$(AzureKinectBodyTrackingSDK)tools\glfw3.dll" $(OutDir)
 copy "$(AzureKinectSDK)tools\k4a.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\k4abt.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
@@ -176,7 +175,6 @@ copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
     <PostBuildEvent>
       <Command>copy "$(AzureKinectSDK)tools\depthengine_2_0.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\dnn_model.onnx" $(OutDir)
-copy "$(AzureKinectBodyTrackingSDK)tools\glfw3.dll" $(OutDir)
 copy "$(AzureKinectSDK)tools\k4a.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\k4abt.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
