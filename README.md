@@ -12,7 +12,7 @@ Not for General purpose.
 
 * Unity2019.2.x
 * Azure Kinect SDK v1.2.0
-* Azure Kinect Body Tracking SDK v0.9.1
+* Azure Kinect Body Tracking SDK v0.9.2
 
 ## Setup to run
 
