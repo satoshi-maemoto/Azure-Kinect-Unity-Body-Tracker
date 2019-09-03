@@ -147,8 +147,8 @@ void KinectBodyTracker::Start()
 							}
 							k4a_image_release(depthImage);
 						}
-
 						k4abt_frame_release(bodyFrame);
+						k4a_capture_release(capture);
 
 						if (this->bodyRecognizedCallback != nullptr)
 						{
