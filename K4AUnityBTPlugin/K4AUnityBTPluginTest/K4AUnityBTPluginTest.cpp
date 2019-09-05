@@ -17,6 +17,7 @@ namespace K4AUnityBTPluginTest
 		static void DebugLog(const char* message)
 		{
 			Logger::WriteMessage(message);
+			Logger::WriteMessage("\n");
 		}
 
 		static void BodyRecognized(int numBodies)
@@ -55,14 +56,19 @@ namespace K4AUnityBTPluginTest
 			DebugLog((string(" SIZE : ") + std::to_string(sizeof(b.body))).c_str());
 			DebugLog((string(" SIZE : ") + std::to_string(sizeof(b.calibratedJointPoints))).c_str());
 
-			K4ABT_Start(-1, -1, -1);
-
-			for (auto i = 0; i < 5; i++)
+			for (int depthMode = K4A_DEPTH_MODE_OFF; depthMode <= K4A_DEPTH_MODE_PASSIVE_IR; depthMode++)
 			{
-				this_thread::sleep_for(chrono::seconds(1));
-			}
+				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode)).c_str());
 
-			K4ABT_End();
+				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode);
+
+				for (auto i = 0; i < 3; i++)
+				{
+					this_thread::sleep_for(chrono::seconds(1));
+				}
+
+				K4ABT_End();
+			}
 		}
 	};
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -12,11 +13,11 @@ namespace AzureKinect.Unity.BodyTracker
         SpineChest,
         Neck,
         ClavicleLeft,
-        SholderLeft,
+        ShoulderLeft,
         ElbowLeft,
         WristLeft,
         ClavicleRight,
-        SholderRight,
+        ShoulderRight,
         ElbowRight,
         WristRight,
         HipLeft,
@@ -34,6 +35,16 @@ namespace AzureKinect.Unity.BodyTracker
         EyeRight,
         EarRight,
     };
+
+    public enum DepthMode
+    {
+        Off = 0,
+        NFov2X2Binned,
+        NFovUnbinned,
+        WFov2X2Binned,
+        WFovUnbinned,
+        PassiveIr,
+    }
 
     [StructLayout(LayoutKind.Sequential)]
     public struct Joint
@@ -78,6 +89,16 @@ namespace AzureKinect.Unity.BodyTracker
     {
         public const int MaxBody = 6;
 
+        public static Dictionary<DepthMode, Vector2> DepthResolutions = new Dictionary<DepthMode, Vector2>()
+        {
+            {DepthMode.Off, new Vector2(0, 0)},
+            {DepthMode.NFov2X2Binned, new Vector2(320, 288)},
+            {DepthMode.NFovUnbinned, new Vector2(640, 576)},
+            {DepthMode.WFov2X2Binned, new Vector2(512, 512)},
+            {DepthMode.WFovUnbinned, new Vector2(1024, 1024)},
+            {DepthMode.PassiveIr, new Vector2(1024, 1024)},
+        };
+
         private static bool IsValidPlatform()
         {
             switch (Application.platform)
@@ -121,12 +142,16 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId);
+        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, int depthMode);
         public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId)
+        {
+            Start(depthTextureId, colorTextureId, transformedDepthTextureId, DepthMode.NFovUnbinned);
+        }
+        public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, DepthMode depthMode)
         {
             if (IsValidPlatform())
             {
-                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId))
+                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId, (int)depthMode))
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }
@@ -139,11 +164,12 @@ namespace AzureKinect.Unity.BodyTracker
         {
             if (IsValidPlatform())
             {
-                SetDebugLogCallback(IntPtr.Zero);
+                SetBodyRecognizedCallback(IntPtr.Zero);
                 if (!K4ABT_End())
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }
+                SetDebugLogCallback(IntPtr.Zero);
             }
         }
 

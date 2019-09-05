@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void Verify(k4a_result_t result, string error)
+void Verify(KinectBodyTracker* self, k4a_result_t result, string error)
 {
 	if (result != K4A_RESULT_SUCCEEDED)
 	{
@@ -14,6 +14,7 @@ void Verify(k4a_result_t result, string error)
 			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_ALLOCATE_BUFFER,
 			nullptr, lastError, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), (LPWSTR)&lastErrorMessage, 0, nullptr);
 		printf("%s \n - (File: %s, Function: %s, Line: %d)\n", error.c_str(), __FILE__, __FUNCTION__, __LINE__);
+		self->Stop();
 		throw exception((error + string(" : ") + Utils::WStringToString(wstring(lastErrorMessage))).c_str());
 	}
 }
@@ -24,15 +25,19 @@ void KinectBodyTracker::Start()
 	deviceConfig.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
 	deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_1080P;
 	deviceConfig.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
+	this->Start(deviceConfig);
+}
 
-	Verify(k4a_device_open(0, &this->device), "Open K4A Device failed!");
-	Verify(k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
+void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
+{
+	Verify(this, k4a_device_open(0, &this->device), "Open K4A Device failed!");
+	Verify(this, k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
 
 	k4a_calibration_t calibration;
-	Verify(k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
+	Verify(this, k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
 		"Get depth camera calibration failed!");
 
-	Verify(k4abt_tracker_create(&calibration, K4ABT_TRACKER_CONFIG_DEFAULT, &this->tracker), "Body tracker initialization failed!");
+	Verify(this, k4abt_tracker_create(&calibration, K4ABT_TRACKER_CONFIG_DEFAULT, &this->tracker), "Body tracker initialization failed!");
 
 
 	this->depth = nullptr;
@@ -195,6 +200,8 @@ void KinectBodyTracker::Start()
 
 void KinectBodyTracker::Stop()
 {
+	this->DebugLog("Started body tracking processing!\n");
+
 	this->isRunning = false;
 	if (this->workerThread.joinable())
 	{

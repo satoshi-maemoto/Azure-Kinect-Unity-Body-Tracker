@@ -18,6 +18,7 @@ public:
 	} Body;
 
 	void Start();
+	void Start(k4a_device_configuration_t deviceConfig);
 	void Stop();
 	void SetDebugLogCallback(DebugLogCallbackPtr callback);
 	void SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
