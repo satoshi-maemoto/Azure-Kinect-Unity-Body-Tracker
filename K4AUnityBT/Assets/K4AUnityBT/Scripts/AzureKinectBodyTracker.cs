@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -12,11 +13,11 @@ namespace AzureKinect.Unity.BodyTracker
         SpineChest,
         Neck,
         ClavicleLeft,
-        SholderLeft,
+        ShoulderLeft,
         ElbowLeft,
         WristLeft,
         ClavicleRight,
-        SholderRight,
+        ShoulderRight,
         ElbowRight,
         WristRight,
         HipLeft,
@@ -35,6 +36,16 @@ namespace AzureKinect.Unity.BodyTracker
         EarRight,
     };
 
+    public enum DepthMode
+    {
+        Off = 0,
+        NFov2X2Binned,
+        NFovUnbinned,
+        WFov2X2Binned,
+        WFovUnbinned,
+        PassiveIr,
+    }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct Joint
     {
@@ -50,23 +61,43 @@ namespace AzureKinect.Unity.BodyTracker
     };
 
     [StructLayout(LayoutKind.Sequential)]
-    public struct Body
+    public struct RawBody
     {
         public uint id;
         public Skeleton skeleton;
+    };
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct Body
+    {
+        public RawBody body;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = (int)JointIndex.EarRight + 1)]
+        public Vector2[] calibratedJointPoints;
 
         public bool IsActive
         {
             get
             {
-                return ((this.id > 0) && (this.skeleton.joints != null) && (this.skeleton.joints.Length > 0));
+                return ((this.body.id > 0) && (this.body.skeleton.joints != null) && (this.body.skeleton.joints.Length > 0));
             }
         }
+
+        public static Body Empty = new Body();
     };
 
     public static class AzureKinectBodyTracker
     {
         public const int MaxBody = 6;
+
+        public static Dictionary<DepthMode, Vector2> DepthResolutions = new Dictionary<DepthMode, Vector2>()
+        {
+            {DepthMode.Off, new Vector2(0, 0)},
+            {DepthMode.NFov2X2Binned, new Vector2(320, 288)},
+            {DepthMode.NFovUnbinned, new Vector2(640, 576)},
+            {DepthMode.WFov2X2Binned, new Vector2(512, 512)},
+            {DepthMode.WFovUnbinned, new Vector2(1024, 1024)},
+            {DepthMode.PassiveIr, new Vector2(1024, 1024)},
+        };
 
         private static bool IsValidPlatform()
         {
@@ -82,15 +113,15 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void DebugDelegate(string message);
+        public delegate void DebugLogDelegate(string message);
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern void K4ABT_SetDebugFunction(IntPtr fp);
-        public static void SetDebugFunction(IntPtr fp)
+        private static extern void K4ABT_SetDebugLogCallback(IntPtr callback);
+        public static void SetDebugLogCallback(IntPtr callback)
         {
             if (IsValidPlatform())
             {
-                K4ABT_SetDebugFunction(fp);
+                K4ABT_SetDebugLogCallback(callback);
             }
         }
 
@@ -111,12 +142,16 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId);
+        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, int depthMode);
         public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId)
+        {
+            Start(depthTextureId, colorTextureId, transformedDepthTextureId, DepthMode.NFovUnbinned);
+        }
+        public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, DepthMode depthMode)
         {
             if (IsValidPlatform())
             {
-                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId))
+                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId, (int)depthMode))
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }
@@ -129,34 +164,58 @@ namespace AzureKinect.Unity.BodyTracker
         {
             if (IsValidPlatform())
             {
+                SetBodyRecognizedCallback(IntPtr.Zero);
                 if (!K4ABT_End())
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }
+                SetDebugLogCallback(IntPtr.Zero);
             }
         }
 
         private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
-        private static int bodiesBufferSize = bodyBufferSize * MaxBody;
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_GetBodies(IntPtr buffer, uint bufferSize);
-        public static Body[] GetBodies()
+        private static extern bool K4ABT_GetBody(IntPtr buffer, int numBodies);
+        public static Body[] GetBody(int numBodies)
         {
-            var result = new Body[MaxBody];
+            var result = new Body[numBodies];
             if (IsValidPlatform())
             {
-                var allocatedMemory = Marshal.AllocHGlobal(bodiesBufferSize);
-                K4ABT_GetBodies(allocatedMemory, MaxBody);
+                var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * numBodies);
+                K4ABT_GetBody(allocatedMemory, numBodies);
                 var p = allocatedMemory;
-                for (int i = 0; i < MaxBody; i++)
+                for (int i = 0; i < numBodies; i++)
                 {
-                    result[i] = (Body)Marshal.PtrToStructure(p, typeof(Body));
+                    result[i] = Marshal.PtrToStructure<Body>(p);
                     p += bodyBufferSize;
                 }
                 Marshal.FreeHGlobal(allocatedMemory);
             }
             return result;
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void BodyRecognizedDelegate(int numBodies);
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern void K4ABT_SetBodyRecognizedCallback(IntPtr callback);
+        public static void SetBodyRecognizedCallback(IntPtr callback)
+        {
+            if (IsValidPlatform())
+            {
+                K4ABT_SetBodyRecognizedCallback(callback);
+            }
+        }
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern void K4ABT_SetCalibratedJointPointAvailability(bool availability);
+        public static void SetCalibratedJointPointAvailability(bool availability)
+        {
+            if (IsValidPlatform())
+            {
+                K4ABT_SetCalibratedJointPointAvailability(availability);
+            }
         }
     }
 
