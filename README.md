@@ -20,7 +20,7 @@ Not for General purpose.
 
 Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 
-* dnn_model.onnx
+* dnn_model_2_0.onnx
 * onnxruntime.dll
 * cublas64_100.dll
 * cudart64_100.dll
