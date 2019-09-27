@@ -31,6 +31,7 @@ public:
 	uint64_t depthTimestamp;
 	unsigned short* transformedDepth = nullptr;
 	uint64_t transformedDepthTimestamp;
+	k4a_imu_sample_t imuData;
 
 private:
 	void DebugLog(const char* message);

@@ -85,6 +85,16 @@ namespace AzureKinect.Unity.BodyTracker
         public static Body Empty = new Body();
     };
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ImuSample
+    {
+        public float temperature;
+        public Vector3 accSample;
+        public ulong accTimestampUsec;
+        public Vector3 gyroSample;
+        public ulong gyroTimestampUsec;
+    };
+
     public static class AzureKinectBodyTracker
     {
         public const int MaxBody = 6;
@@ -217,6 +227,25 @@ namespace AzureKinect.Unity.BodyTracker
                 K4ABT_SetCalibratedJointPointAvailability(availability);
             }
         }
+
+        private static int imuBufferSize = Marshal.SizeOf(typeof(ImuSample));
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern bool K4ABT_GetImuData(IntPtr buffer);
+        public static ImuSample GetImuData()
+        {
+            var result = new ImuSample();
+            if (IsValidPlatform())
+            {
+                var allocatedMemory = Marshal.AllocHGlobal(imuBufferSize);
+                K4ABT_GetImuData(allocatedMemory);
+                var p = allocatedMemory;
+                result = Marshal.PtrToStructure<ImuSample>(allocatedMemory);
+                Marshal.FreeHGlobal(allocatedMemory);
+            }
+            return result;
+        }
+
     }
 
     public class K4ABTException : Exception

@@ -15,6 +15,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         public Material colorMaterial;
         public Material transformedDepthMaterial;
         public Text bodyFps;
+        public Text imuDataText;
 
         private Texture2D depthTexture;
         private Texture2D colorTexture;
@@ -47,6 +48,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 self.bodyFrameCount++;
 
                 var bodies = AzureKinectBodyTracker.GetBody(numBodies);
+                var imuData = AzureKinectBodyTracker.GetImuData();
 
                 self.syncContext.Post((s) =>
                 {
@@ -54,6 +56,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                     {
                         self.bodyVisualizers[i].Apply((i < bodies.Length) ? bodies[i] : Body.Empty, i);
                     }
+                    self.imuDataText.text = $"IMU: TMP={imuData.temperature:0.0000} ACC=({imuData.accSample.x:0.0000},{imuData.accSample.y:0.0000},{imuData.accSample.z:0.0000}) GYRO=({imuData.gyroSample.x:0.0000},{imuData.gyroSample.y:0.0000},{imuData.gyroSample.z:0.0000})";
                 }, null);
             }
             catch (Exception e)

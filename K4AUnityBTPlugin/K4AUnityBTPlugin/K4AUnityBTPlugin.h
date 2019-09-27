@@ -12,5 +12,6 @@ extern "C"
 	__declspec(dllexport) bool K4ABT_GetBody(void* buffer, int numBodies);
 	__declspec(dllexport) void K4ABT_SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
 	__declspec(dllexport) void K4ABT_SetCalibratedJointPointAvailability(bool availability);
+	__declspec(dllexport) bool K4ABT_GetImuData(void* buffer);
 	UNITY_INTERFACE_EXPORT UnityRenderingEventAndData UNITY_INTERFACE_API GetTextureUpdateCallback();
 }
