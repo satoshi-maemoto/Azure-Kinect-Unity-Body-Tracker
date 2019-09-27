@@ -39,6 +39,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
 
 	Verify(this, k4abt_tracker_create(&calibration, K4ABT_TRACKER_CONFIG_DEFAULT, &this->tracker), "Body tracker initialization failed!");
 
+	Verify(this, k4a_device_start_imu(this->device), "Start IMU failed!");
 
 	this->depth = nullptr;
 	this->color = nullptr;
@@ -155,6 +156,8 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
 						k4abt_frame_release(bodyFrame);
 						k4a_capture_release(capture);
 
+						k4a_device_get_imu_sample(this->device, &this->imuData, 0);
+
 						if (this->bodyRecognizedCallback != nullptr)
 						{
 							this->bodyRecognizedCallback(numBodies);
@@ -215,6 +218,7 @@ void KinectBodyTracker::Stop()
 	}
 	if (this->device != nullptr)
 	{
+		k4a_device_stop_imu(this->device);
 		k4a_device_stop_cameras(this->device);
 		k4a_device_close(this->device);
 		this->device = nullptr;

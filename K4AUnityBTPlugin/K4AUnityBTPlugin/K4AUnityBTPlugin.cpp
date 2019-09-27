@@ -131,6 +131,12 @@ void K4ABT_SetCalibratedJointPointAvailability(bool availability)
 	}
 }
 
+bool K4ABT_GetImuData(void* buffer)
+{
+	memcpy(buffer, &tracker->imuData , sizeof(k4a_imu_sample_t));
+	return true;
+}
+
 void OnTextureUpdate(int eventId, void* pData)
 {
 	const auto event = static_cast<UnityRenderingExtEventType>(eventId);

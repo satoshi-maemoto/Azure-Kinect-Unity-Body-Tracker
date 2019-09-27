@@ -44,6 +44,20 @@ namespace K4AUnityBTPluginTest
 						).c_str());
 				}
 			}
+
+			k4a_imu_sample_t imuData;
+			K4ABT_GetImuData(&imuData);
+			DebugLog((
+				"IMU: TMP=" + to_string(imuData.temperature) + " ACC(" +
+				to_string(imuData.acc_sample.xyz.x) + "," +
+				to_string(imuData.acc_sample.xyz.y) + "," +
+				to_string(imuData.acc_sample.xyz.z) + ") GYRO(" +
+				to_string(imuData.gyro_sample.xyz.x) + "," +
+				to_string(imuData.gyro_sample.xyz.y) + "," +
+				to_string(imuData.gyro_sample.xyz.z) + 
+				")"
+				).c_str());
+
 		}
 
 		TEST_METHOD(RunTest)
