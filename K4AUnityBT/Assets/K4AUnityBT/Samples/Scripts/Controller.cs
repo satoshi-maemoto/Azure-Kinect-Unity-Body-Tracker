@@ -52,6 +52,10 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
                 self.syncContext.Post((s) =>
                 {
+                    if (!self.isRunning)
+                    {
+                        return;
+                    }
                     for (var i = 0; self.isRunning && (i < AzureKinectBodyTracker.MaxBody); i++)
                     {
                         self.bodyVisualizers[i].Apply((i < bodies.Length) ? bodies[i] : Body.Empty, i);
