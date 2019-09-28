@@ -30,7 +30,7 @@ public class ImuVisualizer : MonoBehaviour
         var timeDiff = (value.gyroTimestampUsec - this.prevGyroTimestampUsec) / 1000000f;
         this.integralGyro += gyroValue * timeDiff;
         gyroValue = this.integralGyro * Mathf.Rad2Deg;
-        var gyroRotation = Quaternion.Euler(-gyroValue);
+        var gyroRotation = Quaternion.Euler(gyroValue.x, -gyroValue.y, -gyroValue.z);
         this.prevGyroTimestampUsec = value.gyroTimestampUsec;
 
         this.deviceModel.transform.localRotation = Quaternion.identity;
