@@ -93,6 +93,7 @@ namespace AzureKinect.Unity.BodyTracker
         public ulong accTimestampUsec;
         public Vector3 gyroSample;
         public ulong gyroTimestampUsec;
+        public Vector3 integralGyro;
     };
 
     public static class AzureKinectBodyTracker
