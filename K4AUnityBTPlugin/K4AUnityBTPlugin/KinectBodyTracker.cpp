@@ -56,6 +56,8 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
 			k4a_image_t transformedDepthImage = nullptr;
 			auto transformation = k4a_transformation_create(&calibration);
 			int validCalibratedPoint;
+			this->imuData.integralGyro = { 0, 0, 0 };
+			uint64_t prevGyroTimestampUsec = 0;
 
 			do
 			{
@@ -156,14 +158,22 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
 						k4abt_frame_release(bodyFrame);
 						k4a_capture_release(capture);
 
-						k4a_device_get_imu_sample(this->device, &this->imuData, 0);
-
 						if (this->bodyRecognizedCallback != nullptr)
 						{
 							this->bodyRecognizedCallback(numBodies);
 						}
 					}
 				}
+				k4a_device_get_imu_sample(this->device, &this->imuData.imuSample, 0);
+				if (prevGyroTimestampUsec > 0)
+				{
+					auto timeDiff = (this->imuData.imuSample.gyro_timestamp_usec - prevGyroTimestampUsec) / 1000000.0;
+					this->imuData.integralGyro.xyz.x += this->imuData.imuSample.gyro_sample.xyz.x * timeDiff;
+					this->imuData.integralGyro.xyz.y += this->imuData.imuSample.gyro_sample.xyz.y * timeDiff;
+					this->imuData.integralGyro.xyz.z += this->imuData.imuSample.gyro_sample.xyz.z * timeDiff;
+				}
+				prevGyroTimestampUsec = this->imuData.imuSample.gyro_timestamp_usec;
+
 			} while (this->isRunning);
 
 			if (this->tracker != nullptr)

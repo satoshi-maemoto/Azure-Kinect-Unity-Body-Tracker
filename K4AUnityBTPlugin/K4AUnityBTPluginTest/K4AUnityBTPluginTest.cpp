@@ -45,16 +45,19 @@ namespace K4AUnityBTPluginTest
 				}
 			}
 
-			k4a_imu_sample_t imuData;
+			KinectBodyTracker::ImuData imuData;
 			K4ABT_GetImuData(&imuData);
 			DebugLog((
-				"IMU: TMP=" + to_string(imuData.temperature) + " ACC(" +
-				to_string(imuData.acc_sample.xyz.x) + "," +
-				to_string(imuData.acc_sample.xyz.y) + "," +
-				to_string(imuData.acc_sample.xyz.z) + ") GYRO(" +
-				to_string(imuData.gyro_sample.xyz.x) + "," +
-				to_string(imuData.gyro_sample.xyz.y) + "," +
-				to_string(imuData.gyro_sample.xyz.z) + 
+				"IMU: TMP=" + to_string(imuData.imuSample.temperature) + " ACC(" +
+				to_string(imuData.imuSample.acc_sample.xyz.x) + "," +
+				to_string(imuData.imuSample.acc_sample.xyz.y) + "," +
+				to_string(imuData.imuSample.acc_sample.xyz.z) + ") GYRO(" +
+				to_string(imuData.imuSample.gyro_sample.xyz.x) + "," +
+				to_string(imuData.imuSample.gyro_sample.xyz.y) + "," +
+				to_string(imuData.imuSample.gyro_sample.xyz.z) + ")/(" +
+				to_string(imuData.integralGyro.xyz.x) + "," +
+				to_string(imuData.integralGyro.xyz.y) + "," +
+				to_string(imuData.integralGyro.xyz.z) + 
 				")"
 				).c_str());
 

@@ -1267,6 +1267,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   deviceModel: {fileID: 726619069}
   imuDataText: {fileID: 2026714422}
+  target: 1
 --- !u!1 &741321966
 GameObject:
   m_ObjectHideFlags: 0

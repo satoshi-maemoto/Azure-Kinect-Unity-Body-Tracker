@@ -12,10 +12,17 @@ class KinectBodyTracker
 {
 public:
 
-	typedef struct Body {
+	typedef struct Body
+	{
 		k4abt_body_t body;
 		k4a_float2_t calibratedJointPoints[K4ABT_JOINT_COUNT];
 	} Body;
+
+	typedef struct ImuData 
+	{
+		k4a_imu_sample_t imuSample;
+		k4a_float3_t integralGyro;
+	};
 
 	void Start();
 	void Start(k4a_device_configuration_t deviceConfig);
@@ -31,7 +38,7 @@ public:
 	uint64_t depthTimestamp;
 	unsigned short* transformedDepth = nullptr;
 	uint64_t transformedDepthTimestamp;
-	k4a_imu_sample_t imuData;
+	ImuData imuData;
 
 private:
 	void DebugLog(const char* message);
