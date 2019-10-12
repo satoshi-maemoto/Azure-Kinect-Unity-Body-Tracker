@@ -22,10 +22,10 @@ public:
 	{
 		k4a_imu_sample_t imuSample;
 		k4a_float3_t integralGyro;
-	};
+	} ImuData;
 
 	void Start();
-	void Start(k4a_device_configuration_t deviceConfig);
+	void Start(k4a_device_configuration_t deviceConfig, k4abt_tracker_configuration_t trackerConfiguration);
 	void Stop();
 	void SetDebugLogCallback(DebugLogCallbackPtr callback);
 	void SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
