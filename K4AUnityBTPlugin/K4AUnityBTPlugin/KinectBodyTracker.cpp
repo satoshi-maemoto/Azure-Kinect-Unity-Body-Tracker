@@ -25,10 +25,10 @@ void KinectBodyTracker::Start()
 	deviceConfig.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
 	deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_1080P;
 	deviceConfig.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
-	this->Start(deviceConfig);
+	this->Start(deviceConfig, K4ABT_TRACKER_CONFIG_DEFAULT);
 }
 
-void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
+void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tracker_configuration_t trackerConfiguration)
 {
 	Verify(this, k4a_device_open(0, &this->device), "Open K4A Device failed!");
 	Verify(this, k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
@@ -37,7 +37,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
 	Verify(this, k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
 		"Get depth camera calibration failed!");
 
-	Verify(this, k4abt_tracker_create(&calibration, K4ABT_TRACKER_CONFIG_DEFAULT, &this->tracker), "Body tracker initialization failed!");
+	Verify(this, k4abt_tracker_create(&calibration, trackerConfiguration, &this->tracker), "Body tracker initialization failed!");
 
 	Verify(this, k4a_device_start_imu(this->device), "Start IMU failed!");
 
@@ -160,14 +160,14 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig)
 
 						if (this->bodyRecognizedCallback != nullptr)
 						{
-							this->bodyRecognizedCallback(numBodies);
+							this->bodyRecognizedCallback((int)numBodies);
 						}
 					}
 				}
 				k4a_device_get_imu_sample(this->device, &this->imuData.imuSample, 0);
 				if (prevGyroTimestampUsec > 0)
 				{
-					auto timeDiff = (this->imuData.imuSample.gyro_timestamp_usec - prevGyroTimestampUsec) / 1000000.0;
+					auto timeDiff = (float)((this->imuData.imuSample.gyro_timestamp_usec - prevGyroTimestampUsec) / 1000000.0);
 					this->imuData.integralGyro.xyz.x += this->imuData.imuSample.gyro_sample.xyz.x * timeDiff;
 					this->imuData.integralGyro.xyz.y += this->imuData.imuSample.gyro_sample.xyz.y * timeDiff;
 					this->imuData.integralGyro.xyz.z += this->imuData.imuSample.gyro_sample.xyz.z * timeDiff;

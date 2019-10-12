@@ -75,9 +75,18 @@ namespace K4AUnityBTPluginTest
 
 			for (int depthMode = K4A_DEPTH_MODE_OFF; depthMode <= K4A_DEPTH_MODE_PASSIVE_IR; depthMode++)
 			{
-				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode)).c_str());
+				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode) + string(" on CPU")).c_str());
+				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode, true);
 
-				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode);
+				for (auto i = 0; i < 3; i++)
+				{
+					this_thread::sleep_for(chrono::seconds(1));
+				}
+
+				K4ABT_End();
+
+				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode) + string(" on GPU")).c_str());
+				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode, false);
 
 				for (auto i = 0; i < 3; i++)
 				{
