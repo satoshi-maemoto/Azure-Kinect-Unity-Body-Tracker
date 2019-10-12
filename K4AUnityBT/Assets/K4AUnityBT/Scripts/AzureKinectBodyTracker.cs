@@ -16,10 +16,16 @@ namespace AzureKinect.Unity.BodyTracker
         ShoulderLeft,
         ElbowLeft,
         WristLeft,
+        HandLeft,
+        HandTipLeft,
+        ThumbLeft,
         ClavicleRight,
         ShoulderRight,
         ElbowRight,
         WristRight,
+        HandRight,
+        HandTipRight,
+        ThumbRight,
         HipLeft,
         KneeLeft,
         AnkleLeft,
@@ -46,11 +52,20 @@ namespace AzureKinect.Unity.BodyTracker
         PassiveIr,
     }
 
+    public enum JointConfidenceLevel
+    {
+        None = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3,
+    };
+
     [StructLayout(LayoutKind.Sequential)]
     public struct Joint
     {
         public Vector3 position;
         public Quaternion orientation;
+        public JointConfidenceLevel confidenceLevel;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -153,16 +168,16 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, int depthMode);
+        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, int depthMode, bool cpuOnly);
         public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId)
         {
-            Start(depthTextureId, colorTextureId, transformedDepthTextureId, DepthMode.NFovUnbinned);
+            Start(depthTextureId, colorTextureId, transformedDepthTextureId, DepthMode.NFovUnbinned, false);
         }
-        public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, DepthMode depthMode)
+        public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, DepthMode depthMode, bool cpuOnly)
         {
             if (IsValidPlatform())
             {
-                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId, (int)depthMode))
+                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId, (int)depthMode, cpuOnly))
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }

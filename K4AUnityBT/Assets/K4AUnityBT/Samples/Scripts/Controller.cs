@@ -16,6 +16,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         public Material transformedDepthMaterial;
         public Text bodyFps;
         public ImuVisualizer imuVisualizer;
+        public Toggle cpuOnly;
 
         private Texture2D depthTexture;
         private Texture2D colorTexture;
@@ -25,6 +26,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private float fpsMeasured = 0f;
         private bool isRunning = false;
         private Action processCompleted;
+        private DepthMode currentDepthMode = DepthMode.NFovUnbinned;
 
         private static Controller self;
 
@@ -38,7 +40,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             self = this;
             this.syncContext = SynchronizationContext.Current;
 
-            this.StartCoroutine(this.Process(DepthMode.NFovUnbinned));
+            this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
         }
 
         private void BodyRecognizedCallback(int numBodies)
@@ -69,7 +71,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             }
         }
 
-        private IEnumerator Process(DepthMode depthMode)
+        private IEnumerator Process(DepthMode depthMode, bool cpuOnly)
         {
             var debugDelegate = new AzureKinectBodyTracker.DebugLogDelegate(PluginDebugLogCallBack);
             var debagCallback = Marshal.GetFunctionPointerForDelegate(debugDelegate);
@@ -100,7 +102,8 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
             try
             {
-                AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId, depthMode);
+                AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId, depthMode, cpuOnly);
+                this.currentDepthMode = depthMode;
             }
             catch (K4ABTException)
             {
@@ -178,8 +181,19 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         {
             this.processCompleted = () =>
             {
-                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index})");
-                this.StartCoroutine(this.Process((DepthMode)index));
+                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
+                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
+            };
+            this.StopProcess();
+        }
+
+
+        public void CPUOnlyChanged(bool value)
+        {
+            this.processCompleted = () =>
+            {
+                Debug.Log($"ProcessCompleted -> Start({this.currentDepthMode}, CPU Only={value})");
+                this.StartCoroutine(this.Process(this.currentDepthMode, value));
             };
             this.StopProcess();
         }

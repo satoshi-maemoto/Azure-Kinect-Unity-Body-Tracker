@@ -53,7 +53,7 @@ __declspec(dllexport) void K4ABT_GetLastErrorMessage(LPWSTR buffer, DWORD buffer
 }
 
 __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int coloTextureId, unsigned int transformedDepthTextureId, 
-	k4a_depth_mode_t depthMode)
+	k4a_depth_mode_t depthMode, bool cpuOnly)
 {
 	DebugLog("K4ABT_Start()\n");
 
@@ -73,7 +73,10 @@ __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int
 		deviceConfig.depth_mode = depthMode;
 		deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_1080P;
 		deviceConfig.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
-		tracker->Start(deviceConfig);
+
+		auto trackerConfig = K4ABT_TRACKER_CONFIG_DEFAULT;
+		trackerConfig.cpu_only_mode = cpuOnly;
+		tracker->Start(deviceConfig, trackerConfig);
 	}
 	catch (exception exception)
 	{
