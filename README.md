@@ -16,7 +16,7 @@ Not for General purpose.
 * Latest VisualC++ runtime for x64.  
   https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 
-## Setup to run
+## Setup to run on Unity Editor
 
 下記ファイルを Azure-Kinect-Unity-Body-Tracker\K4AUnityBT 配下に配置してください。
 
@@ -33,6 +33,18 @@ Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUnityBT\Plugins\x86_64".
 
 * depthengine_2_0.dll
+
+## Setup to run the builded binary
+
+下記ファイルをビルドしたexeファイルと同じ場所に配置してください。
+
+Put following files at the same path of builded .exe file.
+
+* dnn_model_2_0.onnx
+* onnxruntime.dll
+* cublas64_100.dll
+* cudart64_100.dll
+* cudnn64_7.dll
 
 ## Setup to build the plugin
 
