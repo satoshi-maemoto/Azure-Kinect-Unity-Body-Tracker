@@ -12,7 +12,7 @@ Not for General purpose.
 
 * Unity2019.2.x
 * Azure Kinect SDK v1.3.0
-* Azure Kinect Body Tracking SDK v0.9.4
+* Azure Kinect Body Tracking SDK v0.9.5
 * Latest VisualC++ runtime for x64.  
   https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 
