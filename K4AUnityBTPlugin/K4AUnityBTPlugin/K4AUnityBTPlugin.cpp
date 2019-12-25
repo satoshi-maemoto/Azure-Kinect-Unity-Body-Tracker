@@ -75,7 +75,7 @@ __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int
 		deviceConfig.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
 
 		auto trackerConfig = K4ABT_TRACKER_CONFIG_DEFAULT;
-		trackerConfig.cpu_only_mode = cpuOnly;
+		trackerConfig.processing_mode = cpuOnly ? K4ABT_TRACKER_PROCESSING_MODE_CPU : K4ABT_TRACKER_PROCESSING_MODE_GPU;
 		tracker->Start(deviceConfig, trackerConfig);
 	}
 	catch (exception exception)
