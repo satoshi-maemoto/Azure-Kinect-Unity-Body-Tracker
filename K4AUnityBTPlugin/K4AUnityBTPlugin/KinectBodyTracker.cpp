@@ -51,9 +51,14 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 			size_t depthImageSize = -1;
 			size_t colorImageSize = -1;
 			size_t transformedDepthSize = -1;
+			size_t transformedColorSize = -1;
 			int colorImageWidth = -1;
 			int colorImageHeight = -1;
+			int depthImageWidth = -1;
+			int depthImageHeight = -1;
 			k4a_image_t transformedDepthImage = nullptr;
+			k4a_image_t transformedColorImage = nullptr;
+			k4a_image_t xyzImage = nullptr;
 			auto transformation = k4a_transformation_create(&calibration);
 			int validCalibratedPoint;
 			this->imuData.integralGyro = { 0, 0, 0 };
@@ -110,7 +115,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 								memcpy(this->color, k4a_image_get_buffer(colorImage), colorImageSize);
 								this->colorTimestamp = k4a_image_get_device_timestamp_usec(colorImage);
 							}
-							k4a_image_release(colorImage);
+
 						}
 
 						auto depthImage = k4a_capture_get_depth_image(capture);
@@ -119,6 +124,8 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 							if (depthImageSize == -1)
 							{
 								depthImageSize = k4a_image_get_size(depthImage);
+								depthImageWidth = k4a_image_get_width_pixels(depthImage);
+								depthImageHeight = k4a_image_get_height_pixels(depthImage);
 							}
 							if (this->depth == nullptr)
 							{
@@ -153,8 +160,37 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 									}
 								}
 							}
-							k4a_image_release(depthImage);
 						}
+
+						if (this->colorImageToDepthSpaceCallback != nullptr)
+						{
+							if (transformedColorImage == nullptr) {
+								k4a_image_create(K4A_IMAGE_FORMAT_COLOR_BGRA32, depthImageWidth, depthImageHeight, depthImageWidth * (int)sizeof(uint16_t) * 2, &transformedColorImage);
+							}
+							if (transformedColorImage != nullptr) {
+								if (k4a_transformation_color_image_to_depth_camera(transformation, depthImage, colorImage, transformedColorImage) == K4A_RESULT_SUCCEEDED)
+								{
+									this->colorImageToDepthSpaceCallback(k4a_image_get_buffer(transformedColorImage), k4a_image_get_size(transformedColorImage));
+								}
+							}
+						}
+
+						if (this->depthImageToPointCloudCallback != nullptr)
+						{
+							if (xyzImage == nullptr) {
+								k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, depthImageWidth, depthImageHeight, depthImageWidth* (int)sizeof(uint16_t) * 3, &xyzImage);
+							}
+							if (xyzImage != nullptr) {
+								if (k4a_transformation_depth_image_to_point_cloud(transformation, depthImage, K4A_CALIBRATION_TYPE_DEPTH, xyzImage) == K4A_RESULT_SUCCEEDED)
+								{
+									this->depthImageToPointCloudCallback(k4a_image_get_buffer(xyzImage), (int)k4a_image_get_size(xyzImage));
+								}
+							}
+						}
+
+						k4a_image_release(depthImage);
+						k4a_image_release(colorImage);
+						
 						k4abt_frame_release(bodyFrame);
 						k4a_capture_release(capture);
 
@@ -164,6 +200,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 						}
 					}
 				}
+
 				k4a_device_get_imu_sample(this->device, &this->imuData.imuSample, 0);
 				if (prevGyroTimestampUsec > 0)
 				{
@@ -185,6 +222,17 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 			{
 				k4a_image_release(transformedDepthImage);
 			}
+
+			if (xyzImage != nullptr) 
+			{
+				k4a_image_release(xyzImage);
+			}
+
+			if (transformedColorImage != nullptr)
+			{
+				k4a_image_release(transformedColorImage);
+			}
+
 			if (transformation != nullptr)
 			{
 				k4a_transformation_destroy(transformation);
@@ -259,4 +307,14 @@ void KinectBodyTracker::SetBodyRecognizedCallback(BodyRecognizedCallbackPtr call
 void KinectBodyTracker::SetCalibratedJointPointAvailability(bool availability)
 {
 	this->calibratedJointPointAvailability = availability;
+}
+
+void KinectBodyTracker::SetDepthImageToPointCloudCallback(DepthImageToPointCloudCallbackPtr callback)
+{
+	this->depthImageToPointCloudCallback = callback;
+}
+
+void KinectBodyTracker::SetColorImageToDepthSpaceCallback(ColorImageToDepthSpaceCallbackPtr callback) 
+{
+	this->colorImageToDepthSpaceCallback = callback;
 }
