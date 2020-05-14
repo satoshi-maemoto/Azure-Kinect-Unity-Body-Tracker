@@ -64,15 +64,19 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\K4AUnityBTPlugin\PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\K4AUnityBTPlugin\PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\K4AUnityBTPlugin\PropertySheet.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\K4AUnityBTPlugin\PropertySheet.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -101,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <UseFullPaths>true</UseFullPaths>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -108,14 +113,16 @@
       <AdditionalDependencies>K4AUnityBTPlugin.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(AzureKinectSDK)tools\depthengine_2_0.dll" $(OutDir)
+      <Command>copy "$(AzureKinectSDK)sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\dnn_model_2_0.onnx" $(OutDir)
-copy "$(AzureKinectSDK)tools\k4a.dll" $(OutDir)
+copy "$(AzureKinectSDK)sdk\windows-desktop\amd64\release\bin\k4a.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\k4abt.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\cublas64_100.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\cudart64_100.dll" $(OutDir)
-copy "$(AzureKinectBodyTrackingSDK)tools\cudnn64_7.dll" $(OutDir)</Command>
+copy "$(AzureKinectBodyTrackingSDK)tools\cudnn64_7.dll" $(OutDir)
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -175,9 +182,9 @@ copy "$(AzureKinectBodyTrackingSDK)tools\cudnn64_7.dll" $(OutDir)</Command>
       <AdditionalDependencies>K4AUnityBTPlugin.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(AzureKinectSDK)tools\depthengine_2_0.dll" $(OutDir)
+      <Command>copy "$(AzureKinectSDK)sdk\windows-desktop\amd64\release\bin\depthengine_2_0.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\dnn_model_2_0.onnx" $(OutDir)
-copy "$(AzureKinectSDK)tools\k4a.dll" $(OutDir)
+copy "$(AzureKinectSDK)sdk\windows-desktop\amd64\release\bin\k4a.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\k4abt.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\onnxruntime.dll" $(OutDir)
 copy "$(AzureKinectBodyTrackingSDK)tools\cublas64_100.dll" $(OutDir)

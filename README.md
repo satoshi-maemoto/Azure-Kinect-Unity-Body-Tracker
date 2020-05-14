@@ -11,8 +11,8 @@ Not for General purpose.
 ## Environment
 
 * Unity2019.2.x
-* Azure Kinect SDK v1.3.0
-* Azure Kinect Body Tracking SDK v1.0.0
+* Azure Kinect SDK v1.4.0
+* Azure Kinect Body Tracking SDK v1.0.1
 * Latest VisualC++ runtime for x64.  
   https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 
@@ -22,17 +22,14 @@ Not for General purpose.
 
 Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 
-* dnn_model_2_0.onnx
-* onnxruntime.dll
 * cublas64_100.dll
 * cudart64_100.dll
 * cudnn64_7.dll
-
-下記ファイルを Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUnityBT\Plugins\x86_64 配下に配置してください。
-
-Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUnityBT\Plugins\x86_64".
-
 * depthengine_2_0.dll
+* dnn_model_2_0.onnx
+* k4a.dll
+* k4abt.dll
+* onnxruntime.dll
 
 ## Setup to run the builded binary
 
@@ -40,11 +37,14 @@ Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT\Assets\K4AUni
 
 Put following files at the same path of builded .exe file.
 
-* dnn_model_2_0.onnx
-* onnxruntime.dll
 * cublas64_100.dll
 * cudart64_100.dll
 * cudnn64_7.dll
+* depthengine_2_0.dll
+* dnn_model_2_0.onnx
+* k4a.dll
+* k4abt.dll
+* onnxruntime.dll
 
 ## Setup to build the plugin
 
