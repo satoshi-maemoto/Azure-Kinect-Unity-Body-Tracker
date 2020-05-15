@@ -5,7 +5,7 @@ using System.IO;
 
 public class BuildPostProcessor
 {
-    private static readonly string[] FILES = new string[]{ "dnn_model_2_0.onnx", "onnxruntime.dll", "cublas64_100.dll", "cudart64_100.dll", "cudnn64_7.dll" };
+    private static readonly string[] FILES = new string[]{"cublas64_100.dll", "cudart64_100.dll", "cudnn64_7.dll", "depthengine_2_0.dll", "dnn_model_2_0.onnx", "k4a.dll", "k4abt.dll", "onnxruntime.dll"};
 
     [PostProcessBuild]
     public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
@@ -22,7 +22,11 @@ public class BuildPostProcessor
             if (!File.Exists(destFilePath))
             {
                 string projectFilePath = Path.Combine(Application.dataPath.Replace("/Assets", ""), fileName);
-                File.Copy(projectFilePath, destFilePath);
+
+                if (File.Exists(projectFilePath))
+                {
+                    File.Copy(projectFilePath, destFilePath);
+                }
             }
         }
     }
