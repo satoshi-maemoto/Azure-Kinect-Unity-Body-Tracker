@@ -33,18 +33,9 @@ Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
 
 ## Setup to run the builded binary
 
-下記ファイルをビルドしたexeファイルと同じ場所に配置してください。
+Dependency files are will deploy automatically on building the exe. Thanks to @sakamoto-systemfriend
+https://github.com/satoshi-maemoto/Azure-Kinect-Unity-Body-Tracker/pull/40
 
-Put following files at the same path of builded .exe file.
-
-* cublas64_100.dll
-* cudart64_100.dll
-* cudnn64_7.dll
-* depthengine_2_0.dll
-* dnn_model_2_0.onnx
-* k4a.dll
-* k4abt.dll
-* onnxruntime.dll
 
 ## Setup to build the plugin
 
