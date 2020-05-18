@@ -155,8 +155,9 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 							}
 							k4a_image_release(depthImage);
 						}
-						k4abt_frame_release(bodyFrame);
 						k4a_capture_release(capture);
+						k4abt_frame_release(bodyFrame);
+
 
 						if (this->bodyRecognizedCallback != nullptr)
 						{
@@ -220,7 +221,6 @@ void KinectBodyTracker::Stop()
 	{
 		this->workerThread.join();
 	}
-
 	if (this->tracker != nullptr)
 	{
 		k4abt_tracker_destroy(this->tracker);

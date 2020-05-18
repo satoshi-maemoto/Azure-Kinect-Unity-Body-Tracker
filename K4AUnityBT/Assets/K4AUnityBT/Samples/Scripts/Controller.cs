@@ -17,6 +17,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         public Text bodyFps;
         public ImuVisualizer imuVisualizer;
         public Toggle cpuOnly;
+        public Dropdown modeDropdown;
 
         private Texture2D depthTexture;
         private Texture2D colorTexture;
@@ -27,6 +28,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private bool isRunning = false;
         private Action processCompleted;
         private DepthMode currentDepthMode = DepthMode.NFovUnbinned;
+        private bool isQuitRequested = false;
 
         private static Controller self;
 
@@ -40,7 +42,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             self = this;
             this.syncContext = SynchronizationContext.Current;
 
-            this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
+            //this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
         }
 
         private void BodyRecognizedCallback(int numBodies)
@@ -100,6 +102,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.colorTexture, colorTextureId);
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
 
+            Debug.Log($"this.isQuitRequested= {this.isQuitRequested}");
             try
             {
                 AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId, depthMode, cpuOnly);
@@ -115,6 +118,11 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             {
                 Graphics.ExecuteCommandBuffer(commandBuffer);
                 yield return null;
+            }
+            Debug.Log($"this.isQuitRequested= {this.isQuitRequested}");
+            if (this.isQuitRequested)
+            {
+                yield break;
             }
             AzureKinectBodyTracker.End();
             this.ProcessFinallize();
@@ -156,8 +164,14 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         private void OnApplicationQuit()
         {
+            Debug.Log($"OnApplicationQuit()");
+            this.isQuitRequested = true;
+            this.processCompleted = null;
+
+            this.StopAllCoroutines();
             this.StopProcess();
             AzureKinectBodyTracker.End();
+            this.ProcessFinallize(false);
         }
 
         private void Update()
@@ -179,12 +193,12 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         public void DepthModeChanged(int index)
         {
-            this.processCompleted = () =>
-            {
-                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
-                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
-            };
-            this.StopProcess();
+            //this.processCompleted = () =>
+            //{
+            //    Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
+            //    this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
+            //};
+            //this.StopProcess();
         }
 
 
@@ -196,6 +210,20 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 this.StartCoroutine(this.Process(this.currentDepthMode, value));
             };
             this.StopProcess();
+        }
+
+        public void StartStopButtonClickd()
+        {
+            if (this.isRunning)
+            {
+                this.processCompleted = null;
+                this.StopProcess();
+            }
+            else
+            {
+                var index = this.modeDropdown.value;
+                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
+            }
         }
     }
 }
