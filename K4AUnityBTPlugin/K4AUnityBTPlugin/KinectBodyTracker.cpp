@@ -213,7 +213,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 
 void KinectBodyTracker::Stop()
 {
-	this->DebugLog("Started body tracking processing!\n");
+	this->DebugLog("Stopping body tracking processing!\n");
 
 	this->isRunning = false;
 	if (this->workerThread.joinable())

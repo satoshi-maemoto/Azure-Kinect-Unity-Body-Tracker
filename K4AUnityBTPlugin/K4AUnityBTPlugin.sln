@@ -10,6 +10,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "K4AUnityBTPluginTest", "K4A
 		{0BC5512A-6D0C-4B4F-A421-2D5CE83FE633} = {0BC5512A-6D0C-4B4F-A421-2D5CE83FE633}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppSimpleStream", "CppSimpleStream\CppSimpleStream.vcxproj", "{8CC835D1-D035-4219-B89A-AE324DFA6E52}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0C499EDB-54DE-4A79-A710-1969C63807F8} = {0C499EDB-54DE-4A79-A710-1969C63807F8}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -34,6 +39,14 @@ Global
 		{0C499EDB-54DE-4A79-A710-1969C63807F8}.Release|x64.Build.0 = Release|x64
 		{0C499EDB-54DE-4A79-A710-1969C63807F8}.Release|x86.ActiveCfg = Release|Win32
 		{0C499EDB-54DE-4A79-A710-1969C63807F8}.Release|x86.Build.0 = Release|Win32
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Debug|x64.ActiveCfg = Debug|x64
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Debug|x64.Build.0 = Debug|x64
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Debug|x86.ActiveCfg = Debug|Win32
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Debug|x86.Build.0 = Debug|Win32
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Release|x64.ActiveCfg = Release|x64
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Release|x64.Build.0 = Release|x64
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Release|x86.ActiveCfg = Release|Win32
+		{8CC835D1-D035-4219-B89A-AE324DFA6E52}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
