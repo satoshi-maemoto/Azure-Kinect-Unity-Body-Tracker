@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -12,13 +13,19 @@ namespace AzureKinect.Unity.BodyTracker
         SpineChest,
         Neck,
         ClavicleLeft,
-        SholderLeft,
+        ShoulderLeft,
         ElbowLeft,
         WristLeft,
+        HandLeft,
+        HandTipLeft,
+        ThumbLeft,
         ClavicleRight,
-        SholderRight,
+        ShoulderRight,
         ElbowRight,
         WristRight,
+        HandRight,
+        HandTipRight,
+        ThumbRight,
         HipLeft,
         KneeLeft,
         AnkleLeft,
@@ -35,11 +42,30 @@ namespace AzureKinect.Unity.BodyTracker
         EarRight,
     };
 
+    public enum DepthMode
+    {
+        Off = 0,
+        NFov2X2Binned,
+        NFovUnbinned,
+        WFov2X2Binned,
+        WFovUnbinned,
+        PassiveIr,
+    }
+
+    public enum JointConfidenceLevel
+    {
+        None = 0,
+        Low = 1,
+        Medium = 2,
+        High = 3,
+    };
+
     [StructLayout(LayoutKind.Sequential)]
     public struct Joint
     {
         public Vector3 position;
         public Quaternion orientation;
+        public JointConfidenceLevel confidenceLevel;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -74,9 +100,30 @@ namespace AzureKinect.Unity.BodyTracker
         public static Body Empty = new Body();
     };
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ImuSample
+    {
+        public float temperature;
+        public Vector3 accSample;
+        public ulong accTimestampUsec;
+        public Vector3 gyroSample;
+        public ulong gyroTimestampUsec;
+        public Vector3 integralGyro;
+    };
+
     public static class AzureKinectBodyTracker
     {
         public const int MaxBody = 6;
+
+        public static Dictionary<DepthMode, Vector2> DepthResolutions = new Dictionary<DepthMode, Vector2>()
+        {
+            {DepthMode.Off, new Vector2(0, 0)},
+            {DepthMode.NFov2X2Binned, new Vector2(320, 288)},
+            {DepthMode.NFovUnbinned, new Vector2(640, 576)},
+            {DepthMode.WFov2X2Binned, new Vector2(512, 512)},
+            {DepthMode.WFovUnbinned, new Vector2(1024, 1024)},
+            {DepthMode.PassiveIr, new Vector2(1024, 1024)},
+        };
 
         private static bool IsValidPlatform()
         {
@@ -121,12 +168,16 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId);
+        private static extern bool K4ABT_Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, int depthMode, bool cpuOnly);
         public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId)
+        {
+            Start(depthTextureId, colorTextureId, transformedDepthTextureId, DepthMode.NFovUnbinned, false);
+        }
+        public static void Start(uint depthTextureId, uint colorTextureId, uint transformedDepthTextureId, DepthMode depthMode, bool cpuOnly)
         {
             if (IsValidPlatform())
             {
-                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId))
+                if (!K4ABT_Start(depthTextureId, colorTextureId, transformedDepthTextureId, (int)depthMode, cpuOnly))
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }
@@ -139,11 +190,12 @@ namespace AzureKinect.Unity.BodyTracker
         {
             if (IsValidPlatform())
             {
-                SetDebugLogCallback(IntPtr.Zero);
+                SetBodyRecognizedCallback(IntPtr.Zero);
                 if (!K4ABT_End())
                 {
                     throw new K4ABTException(GetLastErrorMessage());
                 }
+                SetDebugLogCallback(IntPtr.Zero);
             }
         }
 
@@ -191,6 +243,25 @@ namespace AzureKinect.Unity.BodyTracker
                 K4ABT_SetCalibratedJointPointAvailability(availability);
             }
         }
+
+        private static int imuBufferSize = Marshal.SizeOf(typeof(ImuSample));
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern bool K4ABT_GetImuData(IntPtr buffer);
+        public static ImuSample GetImuData()
+        {
+            var result = new ImuSample();
+            if (IsValidPlatform())
+            {
+                var allocatedMemory = Marshal.AllocHGlobal(imuBufferSize);
+                K4ABT_GetImuData(allocatedMemory);
+                var p = allocatedMemory;
+                result = Marshal.PtrToStructure<ImuSample>(allocatedMemory);
+                Marshal.FreeHGlobal(allocatedMemory);
+            }
+            return result;
+        }
+
     }
 
     public class K4ABTException : Exception

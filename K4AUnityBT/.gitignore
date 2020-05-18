@@ -36,7 +36,10 @@ sysinfo.txt
 *.unitypackage
 
 depthengine*.dll
-dnn_model.onnx
+dnn_model*.onnx
 cublas64_100.dll
 cudart64_100.dll
 cudnn64_7.dll
+k4a.dll
+k4abt.dll
+onnxruntime.dll

@@ -4,7 +4,7 @@
 
 using namespace std;
 
-void Verify(k4a_result_t result, string error)
+void Verify(KinectBodyTracker* self, k4a_result_t result, string error)
 {
 	if (result != K4A_RESULT_SUCCEEDED)
 	{
@@ -14,6 +14,7 @@ void Verify(k4a_result_t result, string error)
 			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS | FORMAT_MESSAGE_ARGUMENT_ARRAY | FORMAT_MESSAGE_ALLOCATE_BUFFER,
 			nullptr, lastError, MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US), (LPWSTR)&lastErrorMessage, 0, nullptr);
 		printf("%s \n - (File: %s, Function: %s, Line: %d)\n", error.c_str(), __FILE__, __FUNCTION__, __LINE__);
+		self->Stop();
 		throw exception((error + string(" : ") + Utils::WStringToString(wstring(lastErrorMessage))).c_str());
 	}
 }
@@ -24,16 +25,21 @@ void KinectBodyTracker::Start()
 	deviceConfig.depth_mode = K4A_DEPTH_MODE_NFOV_UNBINNED;
 	deviceConfig.color_resolution = K4A_COLOR_RESOLUTION_1080P;
 	deviceConfig.color_format = K4A_IMAGE_FORMAT_COLOR_BGRA32;
+	this->Start(deviceConfig, K4ABT_TRACKER_CONFIG_DEFAULT);
+}
 
-	Verify(k4a_device_open(0, &this->device), "Open K4A Device failed!");
-	Verify(k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
+void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tracker_configuration_t trackerConfiguration)
+{
+	Verify(this, k4a_device_open(0, &this->device), "Open K4A Device failed!");
+	Verify(this, k4a_device_start_cameras(this->device, &deviceConfig), "Start K4A cameras failed!");
 
 	k4a_calibration_t calibration;
-	Verify(k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
+	Verify(this, k4a_device_get_calibration(this->device, deviceConfig.depth_mode, deviceConfig.color_resolution, &calibration),
 		"Get depth camera calibration failed!");
 
-	Verify(k4abt_tracker_create(&calibration, &this->tracker), "Body tracker initialization failed!");
+	Verify(this, k4abt_tracker_create(&calibration, trackerConfiguration, &this->tracker), "Body tracker initialization failed!");
 
+	Verify(this, k4a_device_start_imu(this->device), "Start IMU failed!");
 
 	this->depth = nullptr;
 	this->color = nullptr;
@@ -50,6 +56,8 @@ void KinectBodyTracker::Start()
 			k4a_image_t transformedDepthImage = nullptr;
 			auto transformation = k4a_transformation_create(&calibration);
 			int validCalibratedPoint;
+			this->imuData.integralGyro = { 0, 0, 0 };
+			uint64_t prevGyroTimestampUsec = 0;
 
 			do
 			{
@@ -147,15 +155,25 @@ void KinectBodyTracker::Start()
 							}
 							k4a_image_release(depthImage);
 						}
-
 						k4abt_frame_release(bodyFrame);
+						k4a_capture_release(capture);
 
 						if (this->bodyRecognizedCallback != nullptr)
 						{
-							this->bodyRecognizedCallback(numBodies);
+							this->bodyRecognizedCallback((int)numBodies);
 						}
 					}
 				}
+				k4a_device_get_imu_sample(this->device, &this->imuData.imuSample, 0);
+				if (prevGyroTimestampUsec > 0)
+				{
+					auto timeDiff = (float)((this->imuData.imuSample.gyro_timestamp_usec - prevGyroTimestampUsec) / 1000000.0);
+					this->imuData.integralGyro.xyz.x += this->imuData.imuSample.gyro_sample.xyz.x * timeDiff;
+					this->imuData.integralGyro.xyz.y += this->imuData.imuSample.gyro_sample.xyz.y * timeDiff;
+					this->imuData.integralGyro.xyz.z += this->imuData.imuSample.gyro_sample.xyz.z * timeDiff;
+				}
+				prevGyroTimestampUsec = this->imuData.imuSample.gyro_timestamp_usec;
+
 			} while (this->isRunning);
 
 			if (this->tracker != nullptr)
@@ -195,6 +213,8 @@ void KinectBodyTracker::Start()
 
 void KinectBodyTracker::Stop()
 {
+	this->DebugLog("Started body tracking processing!\n");
+
 	this->isRunning = false;
 	if (this->workerThread.joinable())
 	{
@@ -208,6 +228,7 @@ void KinectBodyTracker::Stop()
 	}
 	if (this->device != nullptr)
 	{
+		k4a_device_stop_imu(this->device);
 		k4a_device_stop_cameras(this->device);
 		k4a_device_close(this->device);
 		this->device = nullptr;

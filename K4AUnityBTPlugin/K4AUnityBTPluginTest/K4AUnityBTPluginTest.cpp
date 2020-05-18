@@ -17,6 +17,7 @@ namespace K4AUnityBTPluginTest
 		static void DebugLog(const char* message)
 		{
 			Logger::WriteMessage(message);
+			Logger::WriteMessage("\n");
 		}
 
 		static void BodyRecognized(int numBodies)
@@ -43,6 +44,23 @@ namespace K4AUnityBTPluginTest
 						).c_str());
 				}
 			}
+
+			KinectBodyTracker::ImuData imuData;
+			K4ABT_GetImuData(&imuData);
+			DebugLog((
+				"IMU: TMP=" + to_string(imuData.imuSample.temperature) + " ACC(" +
+				to_string(imuData.imuSample.acc_sample.xyz.x) + "," +
+				to_string(imuData.imuSample.acc_sample.xyz.y) + "," +
+				to_string(imuData.imuSample.acc_sample.xyz.z) + ") GYRO(" +
+				to_string(imuData.imuSample.gyro_sample.xyz.x) + "," +
+				to_string(imuData.imuSample.gyro_sample.xyz.y) + "," +
+				to_string(imuData.imuSample.gyro_sample.xyz.z) + ")/(" +
+				to_string(imuData.integralGyro.xyz.x) + "," +
+				to_string(imuData.integralGyro.xyz.y) + "," +
+				to_string(imuData.integralGyro.xyz.z) + 
+				")"
+				).c_str());
+
 		}
 
 		TEST_METHOD(RunTest)
@@ -55,14 +73,28 @@ namespace K4AUnityBTPluginTest
 			DebugLog((string(" SIZE : ") + std::to_string(sizeof(b.body))).c_str());
 			DebugLog((string(" SIZE : ") + std::to_string(sizeof(b.calibratedJointPoints))).c_str());
 
-			K4ABT_Start(-1, -1, -1);
-
-			for (auto i = 0; i < 5; i++)
+			for (int depthMode = K4A_DEPTH_MODE_OFF; depthMode <= K4A_DEPTH_MODE_PASSIVE_IR; depthMode++)
 			{
-				this_thread::sleep_for(chrono::seconds(1));
-			}
+				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode) + string(" on CPU")).c_str());
+				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode, true);
 
-			K4ABT_End();
+				for (auto i = 0; i < 3; i++)
+				{
+					this_thread::sleep_for(chrono::seconds(1));
+				}
+
+				K4ABT_End();
+
+				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode) + string(" on GPU")).c_str());
+				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode, false);
+
+				for (auto i = 0; i < 3; i++)
+				{
+					this_thread::sleep_for(chrono::seconds(1));
+				}
+
+				K4ABT_End();
+			}
 		}
 	};
 }
