@@ -8,6 +8,9 @@
 typedef void(*DebugLogCallbackPtr)(const char*);
 typedef void(*BodyRecognizedCallbackPtr)(int numBodies);
 
+typedef void(*ColorImageToDepthSpaceCallbackPtr)(uint8_t* buffer, int size);
+typedef void(*DepthImageToPointCloudCallbackPtr)(uint8_t* buffer, int size);
+
 class KinectBodyTracker
 {
 public:
@@ -30,6 +33,8 @@ public:
 	void SetDebugLogCallback(DebugLogCallbackPtr callback);
 	void SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
 	void SetCalibratedJointPointAvailability(bool availability);
+	void SetColorImageToDepthSpaceCallback(ColorImageToDepthSpaceCallbackPtr callback);
+	void SetDepthImageToPointCloudCallback(DepthImageToPointCloudCallbackPtr callback);
 
 	Body bodies[K4ABT_MAX_BODY];
 	unsigned long* color = nullptr;
@@ -50,5 +55,8 @@ private:
 	DebugLogCallbackPtr debugLogCallback = nullptr;
 	BodyRecognizedCallbackPtr bodyRecognizedCallback = nullptr;
 	bool calibratedJointPointAvailability = true;
+
+	ColorImageToDepthSpaceCallbackPtr colorImageToDepthSpaceCallback = nullptr;
+	DepthImageToPointCloudCallbackPtr depthImageToPointCloudCallback = nullptr;
 };
 

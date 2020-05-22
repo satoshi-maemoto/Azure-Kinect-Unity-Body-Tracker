@@ -262,6 +262,33 @@ namespace AzureKinect.Unity.BodyTracker
             return result;
         }
 
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void DepthImageToPointCloudDelegate(IntPtr buffer, int size);
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern void K4ABT_SetDepthImageToPointCloudCallback(IntPtr callback);
+
+        public static void SetDepthImageToPointCloudCallback(IntPtr callback)
+        {
+            if (IsValidPlatform())
+            {
+                K4ABT_SetDepthImageToPointCloudCallback(callback);
+            }
+        }
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        public delegate void ColorImageToDepthSpaceDelegate(IntPtr buffer, int size);
+
+        [DllImport("K4AUnityBTPlugin")]
+        private static extern void K4ABT_SetColorImageToDepthSpaceCallback(IntPtr callback);
+
+        public static void SetColorImageToDepthSpaceCallback(IntPtr callback)
+        {
+            if (IsValidPlatform())
+            {
+                K4ABT_SetColorImageToDepthSpaceCallback(callback);
+            }
+        }
     }
 
     public class K4ABTException : Exception
