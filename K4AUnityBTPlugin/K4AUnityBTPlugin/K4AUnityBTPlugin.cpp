@@ -1,5 +1,6 @@
 ﻿// dllmain.cpp : DLL アプリケーションのエントリ ポイントを定義します。
 #include "pch.h"
+#include "tchar.h"
 #include "K4AUnityBTPlugin.h"
 #include "Utils.h"
 
@@ -24,7 +25,40 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_THREAD_DETACH:
 		break;
     case DLL_PROCESS_DETACH:
-		::FreeLibraryAndExitThread(hModule, 0);
+		_RPT0(_CRT_WARN, "K4ABTPlugin FreeLibrary DLL_PROCESS_DETACH Start\n");
+
+//		//		auto releaseTargets = { "cudnn64_7.dll", "cublas64_100.dll", "cudart64_100.dll", "onnxruntime.dll", "k4abt.dll" };
+//		auto releaseTargets = { 
+//			"nvapi64.dll", "nvcuda.dll", "cudnn64_7.dll", "nvcuda.dll", 
+//			"cublas64_100.dll", "nvcuda.dll", "nvcuda.dll", "onnxruntime.dll", 
+//			"nvcuda.dll", "cudart64_100.dll", "nvcuda.dll", "k4abt.dll", "nvcuda.dll"
+//		};
+//		for (auto target : releaseTargets)
+//		{
+//			HMODULE moduleHandle;
+//			if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, target, &moduleHandle)) {
+//				FreeLibrary(moduleHandle);
+//				_RPTN(_CRT_WARN, "K4ABTPlugin FreeLibrary %s\n", target);
+//			}
+//		}
+////		::FreeLibraryAndExitThread(hModule, 0);
+
+
+		auto releaseTargets = 
+		{
+//			"nvapi64.dll", "nvcuda.dll", "cudnn64_7.dll", "cublas64_100.dll", "cudart64_100.dll", "onnxruntime.dll", "k4abt.dll"
+			_T("K4AUnityBTPlugin.dll")
+		};
+		for (auto target : releaseTargets)
+		{
+			HMODULE moduleHandle;
+			if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, target, &moduleHandle)) {
+				FreeLibraryAndExitThread(moduleHandle, 0);
+				_RPTN(_CRT_WARN, "K4ABTPlugin FreeLibrary %s\n", target);
+			}
+		}
+
+		_RPT0(_CRT_WARN, "K4ABTPlugin FreeLibrary DLL_PROCESS_DETACH End\n");
 		break;
     }
     return TRUE;
