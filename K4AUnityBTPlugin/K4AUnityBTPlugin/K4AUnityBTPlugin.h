@@ -13,5 +13,8 @@ extern "C"
 	__declspec(dllexport) void K4ABT_SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
 	__declspec(dllexport) void K4ABT_SetCalibratedJointPointAvailability(bool availability);
 	__declspec(dllexport) bool K4ABT_GetImuData(void* buffer);
+	__declspec(dllexport) void K4ABT_SetColorImageToDepthSpaceCallback(ColorImageToDepthSpaceCallbackPtr callback);
+	__declspec(dllexport) void K4ABT_SetDepthImageToPointCloudCallback(DepthImageToPointCloudCallbackPtr callback);
+
 	UNITY_INTERFACE_EXPORT UnityRenderingEventAndData UNITY_INTERFACE_API GetTextureUpdateCallback();
 }

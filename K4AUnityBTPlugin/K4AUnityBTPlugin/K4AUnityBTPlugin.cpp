@@ -12,6 +12,8 @@ static unsigned int outputColorTextureId = 0;
 static unsigned int outputTransformedDepthTextureId = 0;
 static BodyRecognizedCallbackPtr bodyRecognizedCallback = nullptr;
 
+static ColorImageToDepthSpaceCallbackPtr colorImageToDepthSpaceCallback = nullptr;
+static DepthImageToPointCloudCallbackPtr depthImageToPointCloudCallback = nullptr;
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
@@ -156,6 +158,24 @@ bool K4ABT_GetImuData(void* buffer)
 {
 	memcpy(buffer, &tracker->imuData , sizeof(KinectBodyTracker::ImuData));
 	return true;
+}
+
+void K4ABT_SetDepthImageToPointCloudCallback(DepthImageToPointCloudCallbackPtr callback)
+{
+	depthImageToPointCloudCallback = callback;
+	if (tracker != nullptr) 
+	{
+		tracker->SetDepthImageToPointCloudCallback(depthImageToPointCloudCallback);
+	}
+}
+
+void K4ABT_SetColorImageToDepthSpaceCallback(ColorImageToDepthSpaceCallbackPtr callback) 
+{
+	colorImageToDepthSpaceCallback = callback;
+	if (tracker != nullptr)
+	{
+		tracker->SetColorImageToDepthSpaceCallback(colorImageToDepthSpaceCallback);
+	}
 }
 
 void OnTextureUpdate(int eventId, void* pData)
