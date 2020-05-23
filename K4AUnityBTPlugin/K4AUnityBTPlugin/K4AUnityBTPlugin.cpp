@@ -27,26 +27,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_DETACH:
 		_RPT0(_CRT_WARN, "K4ABTPlugin FreeLibrary DLL_PROCESS_DETACH Start\n");
 
-//		//		auto releaseTargets = { "cudnn64_7.dll", "cublas64_100.dll", "cudart64_100.dll", "onnxruntime.dll", "k4abt.dll" };
-//		auto releaseTargets = { 
-//			"nvapi64.dll", "nvcuda.dll", "cudnn64_7.dll", "nvcuda.dll", 
-//			"cublas64_100.dll", "nvcuda.dll", "nvcuda.dll", "onnxruntime.dll", 
-//			"nvcuda.dll", "cudart64_100.dll", "nvcuda.dll", "k4abt.dll", "nvcuda.dll"
-//		};
-//		for (auto target : releaseTargets)
-//		{
-//			HMODULE moduleHandle;
-//			if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, target, &moduleHandle)) {
-//				FreeLibrary(moduleHandle);
-//				_RPTN(_CRT_WARN, "K4ABTPlugin FreeLibrary %s\n", target);
-//			}
-//		}
-////		::FreeLibraryAndExitThread(hModule, 0);
-
-
 		auto releaseTargets = 
 		{
-//			"nvapi64.dll", "nvcuda.dll", "cudnn64_7.dll", "cublas64_100.dll", "cudart64_100.dll", "onnxruntime.dll", "k4abt.dll"
 			_T("K4AUnityBTPlugin.dll")
 		};
 		for (auto target : releaseTargets)

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -42,7 +41,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             self = this;
             this.syncContext = SynchronizationContext.Current;
 
-            //this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
+            this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
         }
 
         private void BodyRecognizedCallback(int numBodies)
@@ -181,14 +180,13 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         public void DepthModeChanged(int index)
         {
-            //this.processCompleted = () =>
-            //{
-            //    Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
-            //    this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
-            //};
-            //this.StopProcess();
+            this.processCompleted = () =>
+            {
+                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
+                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
+            };
+            this.StopProcess();
         }
-
 
         public void CPUOnlyChanged(bool value)
         {
@@ -198,20 +196,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 this.StartCoroutine(this.Process(this.currentDepthMode, value));
             };
             this.StopProcess();
-        }
-
-        public void StartStopButtonClickd()
-        {
-            if (this.isRunning)
-            {
-                this.processCompleted = null;
-                this.StopProcess();
-            }
-            else
-            {
-                var index = this.modeDropdown.value;
-                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
-            }
         }
     }
 }
