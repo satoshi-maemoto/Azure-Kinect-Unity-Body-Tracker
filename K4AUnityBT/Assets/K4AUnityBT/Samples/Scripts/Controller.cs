@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -28,7 +29,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private bool isRunning = false;
         private Action processCompleted;
         private DepthMode currentDepthMode = DepthMode.NFovUnbinned;
-        private bool isQuitRequested = false;
 
         private static Controller self;
 
@@ -102,7 +102,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.colorTexture, colorTextureId);
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
 
-            Debug.Log($"this.isQuitRequested= {this.isQuitRequested}");
             try
             {
                 AzureKinectBodyTracker.Start(depthTextureId, colorTextureId, transformedDepthTextureId, depthMode, cpuOnly);
@@ -118,11 +117,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             {
                 Graphics.ExecuteCommandBuffer(commandBuffer);
                 yield return null;
-            }
-            Debug.Log($"this.isQuitRequested= {this.isQuitRequested}");
-            if (this.isQuitRequested)
-            {
-                yield break;
             }
             AzureKinectBodyTracker.End();
             this.ProcessFinallize();
@@ -147,7 +141,23 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 this.processCompleted?.Invoke();
             }
             this.processCompleted = null;
+
+            IntPtr hModule;
+            if (GetModuleHandleExW(0x00000002, new StringBuilder("K4AUnityBTPlugin.dll"), out hModule))
+            {
+                FreeLibrary(hModule);
+            }
+
         }
+
+        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetModuleHandleExW(uint dwFlags, StringBuilder lpModuleName, out IntPtr hModule);
+
+        [DllImport("kernel32", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
 
         private void StopProcess()
         {
@@ -164,14 +174,8 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         private void OnApplicationQuit()
         {
-            Debug.Log($"OnApplicationQuit()");
-            this.isQuitRequested = true;
-            this.processCompleted = null;
-
-            this.StopAllCoroutines();
             this.StopProcess();
             AzureKinectBodyTracker.End();
-            this.ProcessFinallize(false);
         }
 
         private void Update()
