@@ -1,5 +1,6 @@
 ﻿// dllmain.cpp : DLL アプリケーションのエントリ ポイントを定義します。
 #include "pch.h"
+#include "tchar.h"
 #include "K4AUnityBTPlugin.h"
 #include "Utils.h"
 
@@ -24,8 +25,25 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     case DLL_PROCESS_ATTACH:
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
+		break;
     case DLL_PROCESS_DETACH:
-        break;
+		_RPT0(_CRT_WARN, "K4ABTPlugin FreeLibrary DLL_PROCESS_DETACH Start\n");
+
+		auto releaseTargets = 
+		{
+			_T("K4AUnityBTPlugin.dll")
+		};
+		for (auto target : releaseTargets)
+		{
+			HMODULE moduleHandle;
+			if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, target, &moduleHandle)) {
+				//FreeLibraryAndExitThread(moduleHandle, 0);
+				_RPTWN(_CRT_WARN, _T("K4ABTPlugin FreeLibrary %s\n"), target);
+			}
+		}
+
+		_RPT0(_CRT_WARN, "K4ABTPlugin FreeLibrary DLL_PROCESS_DETACH End\n");
+		break;
     }
     return TRUE;
 }

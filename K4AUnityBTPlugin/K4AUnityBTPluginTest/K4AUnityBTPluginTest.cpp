@@ -73,7 +73,7 @@ namespace K4AUnityBTPluginTest
 			DebugLog((string(" SIZE : ") + std::to_string(sizeof(b.body))).c_str());
 			DebugLog((string(" SIZE : ") + std::to_string(sizeof(b.calibratedJointPoints))).c_str());
 
-			for (int depthMode = K4A_DEPTH_MODE_OFF; depthMode <= K4A_DEPTH_MODE_PASSIVE_IR; depthMode++)
+			for (int depthMode = K4A_DEPTH_MODE_OFF; depthMode <= K4A_DEPTH_MODE_PASSIVE_IR; depthMode++) 
 			{
 				DebugLog((string(" Depth Mode : ") + std::to_string(depthMode) + string(" on CPU")).c_str());
 				K4ABT_Start(-1, -1, -1, (k4a_depth_mode_t)depthMode, true);

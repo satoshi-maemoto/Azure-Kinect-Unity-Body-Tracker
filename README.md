@@ -11,25 +11,27 @@ Not for General purpose.
 ## Environment
 
 * Unity2019.2.x
-* Azure Kinect SDK v1.4.0
-* Azure Kinect Body Tracking SDK v1.0.1
+* Azure Kinect Body Tracking SDK v1.0.1 provided NuGet
 * Latest VisualC++ runtime for x64.  
   https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
 
 ## Setup to run on Unity Editor
 
-下記ファイルを Azure-Kinect-Unity-Body-Tracker\K4AUnityBT 配下に配置してください。
+1. 以下のURLと同じ手順に従って、NuGetからパッケージを取得し、ファイルを配置します。  
+Follow the same procedure as the URL below to get the package from NuGet and place the file.  
+https://github.com/microsoft/Azure-Kinect-Samples/tree/master/body-tracking-samples/sample_unity_bodytracking#sample-unity-body-tracking-application
 
-Put following files at "Azure-Kinect-Unity-Body-Tracker\K4AUnityBT".
+2. 下記ファイルを "Assets/Plugins" から　"Assets\K4AUnityBT\Plugins\x86_64" へ移動します。  
+Move following files from "Assets/Plugins" to  "Assets\K4AUnityBT\Plugins\x86_6".
 
 * cublas64_100.dll
 * cudart64_100.dll
-* cudnn64_7.dll
 * depthengine_2_0.dll
-* dnn_model_2_0.onnx
 * k4a.dll
 * k4abt.dll
+* k4arecord.dll
 * onnxruntime.dll
+* vcomp140.dll
 
 ## Setup to run the builded binary
 
@@ -37,7 +39,7 @@ Dependency files are will deploy automatically on building the exe. Thanks to @s
 https://github.com/satoshi-maemoto/Azure-Kinect-Unity-Body-Tracker/pull/40
 
 
-## Setup to build the plugin
+## Setup to build the plugin (Optionaly)
 
 VisualStudioのプロパティマネージャーで下記ユーザーマクロを設定してください。
 

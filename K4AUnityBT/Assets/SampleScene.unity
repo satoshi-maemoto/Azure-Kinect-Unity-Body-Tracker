@@ -2884,6 +2884,7 @@ MonoBehaviour:
   bodyFps: {fileID: 2126148107}
   imuVisualizer: {fileID: 731135190}
   cpuOnly: {fileID: 238293769}
+  modeDropdown: {fileID: 1008077763}
 --- !u!4 &1226367988
 Transform:
   m_ObjectHideFlags: 0

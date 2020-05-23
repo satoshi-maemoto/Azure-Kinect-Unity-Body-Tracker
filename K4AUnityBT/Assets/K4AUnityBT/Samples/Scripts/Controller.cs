@@ -17,6 +17,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         public Text bodyFps;
         public ImuVisualizer imuVisualizer;
         public Toggle cpuOnly;
+        public Dropdown modeDropdown;
 
         private Texture2D depthTexture;
         private Texture2D colorTexture;
@@ -186,7 +187,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             };
             this.StopProcess();
         }
-
 
         public void CPUOnlyChanged(bool value)
         {
