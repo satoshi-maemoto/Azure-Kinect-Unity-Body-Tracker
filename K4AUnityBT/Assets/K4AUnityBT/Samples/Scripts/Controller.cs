@@ -141,23 +141,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 this.processCompleted?.Invoke();
             }
             this.processCompleted = null;
-
-            IntPtr hModule;
-            if (GetModuleHandleExW(0x00000002, new StringBuilder("K4AUnityBTPlugin.dll"), out hModule))
-            {
-                FreeLibrary(hModule);
-            }
-
         }
-
-        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Unicode)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool GetModuleHandleExW(uint dwFlags, StringBuilder lpModuleName, out IntPtr hModule);
-
-        [DllImport("kernel32", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FreeLibrary(IntPtr hModule);
-
 
         private void StopProcess()
         {

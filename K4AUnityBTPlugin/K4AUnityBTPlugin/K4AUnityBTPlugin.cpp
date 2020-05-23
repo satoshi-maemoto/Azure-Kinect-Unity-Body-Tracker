@@ -53,8 +53,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		{
 			HMODULE moduleHandle;
 			if (GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, target, &moduleHandle)) {
-				FreeLibraryAndExitThread(moduleHandle, 0);
-				_RPTN(_CRT_WARN, "K4ABTPlugin FreeLibrary %s\n", target);
+				//FreeLibraryAndExitThread(moduleHandle, 0);
+				_RPTWN(_CRT_WARN, _T("K4ABTPlugin FreeLibrary %s\n"), target);
 			}
 		}
 

@@ -64,12 +64,12 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 				k4a_capture_t capture;
 				if (k4a_device_get_capture(this->device, &capture, 0) == K4A_WAIT_RESULT_SUCCEEDED)
 				{
-					auto queueCaptureResult = k4abt_tracker_enqueue_capture(this->tracker, capture, 0);
-					k4a_capture_release(capture);
-					if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
-					{
-						this->DebugLog("Error! Add capture to tracker process queue failed!\n");
-					}
+					//auto queueCaptureResult = k4abt_tracker_enqueue_capture(this->tracker, capture, 0);
+					//k4a_capture_release(capture);
+					//if (queueCaptureResult == K4A_WAIT_RESULT_FAILED)
+					//{
+					//	this->DebugLog("Error! Add capture to tracker process queue failed!\n");
+					//}
 
 					k4abt_frame_t bodyFrame = nullptr;
 					if (k4abt_tracker_pop_result(this->tracker, &bodyFrame, 0) == K4A_WAIT_RESULT_SUCCEEDED)

@@ -41,5 +41,7 @@ cublas64_100.dll
 cudart64_100.dll
 cudnn64_7.dll
 k4a.dll
+k4arecord.dll
 k4abt.dll
 onnxruntime.dll
+vcomp140.dll
