@@ -319,7 +319,7 @@ MonoBehaviour:
   initialCameraPosition: {x: 0, y: 0, z: -600}
   rotateSpeed: 10
   translateSpeed: 50
-  scaleSpeed: 5
+  scaleSpeed: 1
 --- !u!4 &93222172
 Transform:
   m_ObjectHideFlags: 0
