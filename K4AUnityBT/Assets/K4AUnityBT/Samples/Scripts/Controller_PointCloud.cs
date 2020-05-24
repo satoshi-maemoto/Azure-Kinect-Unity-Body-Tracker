@@ -3,7 +3,6 @@ using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace AzureKinect.Unity.BodyTracker.Sample
@@ -11,8 +10,8 @@ namespace AzureKinect.Unity.BodyTracker.Sample
     public class Controller_PointCloud : MonoBehaviour
     {
         public Text bodyFps;
-        public Toggle cpuOnly;
         public GameObject pointCloud;
+        public Material[] pointCloudMaterials;
 
         private Texture2D depthTexture;
         private Texture2D colorTexture;
@@ -24,6 +23,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private Action processCompleted;
         private DepthMode currentDepthMode = DepthMode.NFovUnbinned;
         private Mesh mesh = null;
+        private int pointCloudMaterialIndex = 0;
 
         private static Controller_PointCloud self;
 
@@ -211,29 +211,20 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             }
         }
 
-        public void CalibratedJointPointToggleValueChanged(bool value)
-        {
-            AzureKinectBodyTracker.SetCalibratedJointPointAvailability(value);
-        }
-
         public void DepthModeChanged(int index)
         {
             this.processCompleted = () =>
             {
-                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
-                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
+                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index})");
+                this.StartCoroutine(this.Process((DepthMode)index, false));
             };
             this.StopProcess();
         }
 
-        public void CPUOnlyChanged(bool value)
+        public void SwitchMaterial()
         {
-            this.processCompleted = () =>
-            {
-                Debug.Log($"ProcessCompleted -> Start({this.currentDepthMode}, CPU Only={value})");
-                this.StartCoroutine(this.Process(this.currentDepthMode, value));
-            };
-            this.StopProcess();
+            this.pointCloudMaterialIndex = (this.pointCloudMaterialIndex == 0) ? 1 : 0;
+            this.pointCloud.GetComponent<Renderer>().material = this.pointCloudMaterials[this.pointCloudMaterialIndex];
         }
     }
 }
