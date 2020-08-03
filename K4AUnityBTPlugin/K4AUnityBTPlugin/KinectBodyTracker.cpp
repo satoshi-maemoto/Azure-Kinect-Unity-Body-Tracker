@@ -80,6 +80,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 					if (k4abt_tracker_pop_result(this->tracker, &bodyFrame, 0) == K4A_WAIT_RESULT_SUCCEEDED)
 					{
 						auto numBodies = k4abt_frame_get_num_bodies(bodyFrame);
+						numBodies = (numBodies < K4ABT_MAX_BODY) ? numBodies : K4ABT_MAX_BODY;
 						memset(this->bodies, 0, sizeof(Body) * K4ABT_MAX_BODY);
 						for (auto i = 0; i < numBodies; ++i)
 						{
