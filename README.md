@@ -10,7 +10,7 @@ Not for General purpose.
 
 ## Environment
 
-* Unity2019.2.x
+* Unity2019.4.x
 * Azure Kinect Body Tracking SDK v1.0.1 provided NuGet
 * Latest VisualC++ runtime for x64.  
   https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads
