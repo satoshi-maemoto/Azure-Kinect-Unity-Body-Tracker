@@ -45,3 +45,12 @@ k4arecord.dll
 k4abt.dll
 onnxruntime.dll
 vcomp140.dll
+
+Logs
+Packages
+directml.dll
+onnxruntime_providers_*.dll
+Microsoft.Azure.Kinect.*.dll
+Microsoft.Azure.Kinect.*.xml
+Microsoft.Azure.Kinect.*.json
+**/x86_64/System.*.dll

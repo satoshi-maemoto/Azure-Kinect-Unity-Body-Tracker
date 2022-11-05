@@ -44,7 +44,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
         }
 
-        private void BodyRecognizedCallback(int numBodies)
+        private void BodyRecognizedCallback(UInt32 numBodies)
         {
             try
             {
@@ -72,13 +72,16 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             }
         }
 
+        private AzureKinectBodyTracker.DebugLogDelegate debugDelegate = null;
+        private AzureKinectBodyTracker.BodyRecognizedDelegate bodyRecognizedDelegate = null;
+
         private IEnumerator Process(DepthMode depthMode, bool cpuOnly)
         {
-            var debugDelegate = new AzureKinectBodyTracker.DebugLogDelegate(PluginDebugLogCallBack);
+            this.debugDelegate = new AzureKinectBodyTracker.DebugLogDelegate(PluginDebugLogCallBack);
             var debagCallback = Marshal.GetFunctionPointerForDelegate(debugDelegate);
             AzureKinectBodyTracker.SetDebugLogCallback(debagCallback);
 
-            var bodyRecognizedDelegate = new AzureKinectBodyTracker.BodyRecognizedDelegate(this.BodyRecognizedCallback);
+            this.bodyRecognizedDelegate = new AzureKinectBodyTracker.BodyRecognizedDelegate(this.BodyRecognizedCallback);
             var bodyRecognizedCallback = Marshal.GetFunctionPointerForDelegate(bodyRecognizedDelegate);
             AzureKinectBodyTracker.SetBodyRecognizedCallback(bodyRecognizedCallback);
 

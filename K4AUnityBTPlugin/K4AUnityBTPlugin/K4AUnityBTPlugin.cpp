@@ -127,7 +127,7 @@ __declspec(dllexport) bool K4ABT_End()
 	return true;
 }
 
-bool K4ABT_GetBody(void* buffer, int numBodies)
+bool K4ABT_GetBody(void* buffer, uint32_t numBodies)
 {
 	if (numBodies > K4ABT_MAX_BODY)
 	{
