@@ -9,7 +9,7 @@ extern "C"
 	__declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int coloTextureId, unsigned int transformedDepthTextureId,
 		k4a_depth_mode_t depthMode, bool cpuOnly);
 	__declspec(dllexport) bool K4ABT_End();
-	__declspec(dllexport) bool K4ABT_GetBody(void* buffer, int numBodies);
+	__declspec(dllexport) bool K4ABT_GetBody(void* buffer, uint32_t numBodies);
 	__declspec(dllexport) void K4ABT_SetBodyRecognizedCallback(BodyRecognizedCallbackPtr callback);
 	__declspec(dllexport) void K4ABT_SetCalibratedJointPointAvailability(bool availability);
 	__declspec(dllexport) bool K4ABT_GetImuData(void* buffer);

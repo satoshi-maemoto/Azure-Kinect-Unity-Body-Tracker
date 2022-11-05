@@ -15,7 +15,7 @@ static void DebugLog(const char* message)
 	std::cout << message << std::endl;
 }
 
-static void BodyRecognized(int numBodies)
+static void BodyRecognized(uint32_t numBodies)
 {
 	KinectBodyTracker::Body bodies[K4ABT_MAX_BODY];
 	K4ABT_GetBody(bodies, numBodies);

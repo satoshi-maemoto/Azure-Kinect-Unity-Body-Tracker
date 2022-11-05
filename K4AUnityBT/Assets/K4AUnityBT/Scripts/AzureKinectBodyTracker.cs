@@ -202,13 +202,13 @@ namespace AzureKinect.Unity.BodyTracker
         private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
 
         [DllImport("K4AUnityBTPlugin")]
-        private static extern bool K4ABT_GetBody(IntPtr buffer, int numBodies);
-        public static Body[] GetBody(int numBodies)
+        private static extern bool K4ABT_GetBody(IntPtr buffer, UInt32 numBodies);
+        public static Body[] GetBody(UInt32 numBodies)
         {
             var result = new Body[numBodies];
             if (IsValidPlatform())
             {
-                var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * numBodies);
+                var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * (int)numBodies);
                 K4ABT_GetBody(allocatedMemory, numBodies);
                 var p = allocatedMemory;
                 for (int i = 0; i < numBodies; i++)
@@ -222,7 +222,7 @@ namespace AzureKinect.Unity.BodyTracker
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-        public delegate void BodyRecognizedDelegate(int numBodies);
+        public delegate void BodyRecognizedDelegate(UInt32 numBodies);
 
         [DllImport("K4AUnityBTPlugin")]
         private static extern void K4ABT_SetBodyRecognizedCallback(IntPtr callback);

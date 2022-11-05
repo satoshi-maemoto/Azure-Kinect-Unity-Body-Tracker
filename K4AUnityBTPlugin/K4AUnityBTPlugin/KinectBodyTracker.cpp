@@ -179,7 +179,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 						if (this->depthImageToPointCloudCallback != nullptr)
 						{
 							if (xyzImage == nullptr) {
-								k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, depthImageWidth, depthImageHeight, depthImageWidth* (int)sizeof(uint16_t) * 3, &xyzImage);
+								k4a_image_create(K4A_IMAGE_FORMAT_CUSTOM, depthImageWidth, depthImageHeight, depthImageWidth * (int)sizeof(uint16_t) * 3, &xyzImage);
 							}
 							if (xyzImage != nullptr) {
 								if (k4a_transformation_depth_image_to_point_cloud(transformation, depthImage, K4A_CALIBRATION_TYPE_DEPTH, xyzImage) == K4A_RESULT_SUCCEEDED)
@@ -191,7 +191,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 
 						k4a_image_release(depthImage);
 						k4a_image_release(colorImage);
-						
+
 						k4abt_frame_release(bodyFrame);
 						k4a_capture_release(capture);
 						k4abt_frame_release(bodyFrame);
@@ -199,7 +199,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 
 						if (this->bodyRecognizedCallback != nullptr)
 						{
-							this->bodyRecognizedCallback((int)numBodies);
+							this->bodyRecognizedCallback(numBodies);
 						}
 					}
 				}
@@ -226,7 +226,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 				k4a_image_release(transformedDepthImage);
 			}
 
-			if (xyzImage != nullptr) 
+			if (xyzImage != nullptr)
 			{
 				k4a_image_release(xyzImage);
 			}
@@ -258,7 +258,7 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 			}
 
 			this->DebugLog("Finished worker thread\n");
-		}
+							}
 	);
 }
 
@@ -316,7 +316,7 @@ void KinectBodyTracker::SetDepthImageToPointCloudCallback(DepthImageToPointCloud
 	this->depthImageToPointCloudCallback = callback;
 }
 
-void KinectBodyTracker::SetColorImageToDepthSpaceCallback(ColorImageToDepthSpaceCallbackPtr callback) 
+void KinectBodyTracker::SetColorImageToDepthSpaceCallback(ColorImageToDepthSpaceCallbackPtr callback)
 {
 	this->colorImageToDepthSpaceCallback = callback;
 }

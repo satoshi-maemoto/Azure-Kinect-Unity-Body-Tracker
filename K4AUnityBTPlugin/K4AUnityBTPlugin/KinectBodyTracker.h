@@ -6,7 +6,7 @@
 #define K4ABT_MAX_BODY 6
 
 typedef void(*DebugLogCallbackPtr)(const char*);
-typedef void(*BodyRecognizedCallbackPtr)(int numBodies);
+typedef void(*BodyRecognizedCallbackPtr)(uint32_t numBodies);
 
 typedef void(*ColorImageToDepthSpaceCallbackPtr)(uint8_t* buffer, int size);
 typedef void(*DepthImageToPointCloudCallbackPtr)(uint8_t* buffer, int size);
