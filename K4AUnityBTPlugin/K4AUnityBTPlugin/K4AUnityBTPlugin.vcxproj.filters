@@ -45,4 +45,9 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="dnn_model_2_0_op11.onnx" />
+    <None Include="dnn_model_2_0_lite_op11.onnx" />
+  </ItemGroup>
 </Project>
