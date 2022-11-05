@@ -5,7 +5,7 @@ using System.IO;
 
 public class BuildPostProcessor
 {
-    private static readonly string[] FILES = new string[]{"cublas64_100.dll", "cudart64_100.dll", "cudnn64_7.dll", "dnn_model_2_0.onnx", "onnxruntime.dll"};
+    private static readonly string[] FILES = new string[]{ "directml.dll", "dnn_model_2_0_op11.onnx", "onnxruntime.dll"};
 
     [PostProcessBuild]
     public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
