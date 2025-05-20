@@ -192,9 +192,8 @@ void KinectBodyTracker::Start(k4a_device_configuration_t deviceConfig, k4abt_tra
 						k4a_image_release(depthImage);
 						k4a_image_release(colorImage);
 
-						k4abt_frame_release(bodyFrame);
-						k4a_capture_release(capture);
-						k4abt_frame_release(bodyFrame);
+                                                k4abt_frame_release(bodyFrame);
+                                                k4a_capture_release(capture);
 
 
 						if (this->bodyRecognizedCallback != nullptr)
