@@ -1,4 +1,5 @@
-﻿using System;
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -196,10 +197,18 @@ namespace AzureKinect.Unity.BodyTracker
                     throw new K4ABTException(GetLastErrorMessage());
                 }
                 SetDebugLogCallback(IntPtr.Zero);
+                if (bodyBuffer != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(bodyBuffer);
+                    bodyBuffer = IntPtr.Zero;
+                    bodyBufferCapacity = 0;
+                }
             }
         }
 
         private static int bodyBufferSize = Marshal.SizeOf(typeof(Body));
+        private static IntPtr bodyBuffer = IntPtr.Zero;
+        private static int bodyBufferCapacity = 0;
 
         [DllImport("K4AUnityBTPlugin")]
         private static extern bool K4ABT_GetBody(IntPtr buffer, UInt32 numBodies);
@@ -208,15 +217,24 @@ namespace AzureKinect.Unity.BodyTracker
             var result = new Body[numBodies];
             if (IsValidPlatform())
             {
-                var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * (int)numBodies);
-                K4ABT_GetBody(allocatedMemory, numBodies);
-                var p = allocatedMemory;
+                int requiredSize = bodyBufferSize * (int)numBodies;
+                if (bodyBuffer == IntPtr.Zero || bodyBufferCapacity < requiredSize)
+                {
+                    if (bodyBuffer != IntPtr.Zero)
+                    {
+                        Marshal.FreeHGlobal(bodyBuffer);
+                    }
+                    bodyBuffer = Marshal.AllocHGlobal(requiredSize);
+                    bodyBufferCapacity = requiredSize;
+                }
+
+                K4ABT_GetBody(bodyBuffer, numBodies);
+                var p = bodyBuffer;
                 for (int i = 0; i < numBodies; i++)
                 {
                     result[i] = Marshal.PtrToStructure<Body>(p);
                     p += bodyBufferSize;
                 }
-                Marshal.FreeHGlobal(allocatedMemory);
             }
             return result;
         }
@@ -298,3 +316,4 @@ namespace AzureKinect.Unity.BodyTracker
         }
     }
 }
+#endif
