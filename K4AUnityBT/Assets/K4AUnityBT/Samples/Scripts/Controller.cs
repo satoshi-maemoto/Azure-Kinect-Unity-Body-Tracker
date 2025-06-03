@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -29,8 +30,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private Action processCompleted;
         private DepthMode currentDepthMode = DepthMode.NFovUnbinned;
 
-        private static Controller self;
-
         static void PluginDebugLogCallBack(string message)
         {
             Debug.Log("K4ABT : " + message);
@@ -38,7 +37,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         void Start()
         {
-            self = this;
             this.syncContext = SynchronizationContext.Current;
 
             this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
@@ -48,22 +46,22 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         {
             try
             {
-                self.bodyFrameCount++;
+                bodyFrameCount++;
 
                 var bodies = AzureKinectBodyTracker.GetBody(numBodies);
                 var imuData = AzureKinectBodyTracker.GetImuData();
 
-                self.syncContext.Post((s) =>
+                syncContext.Post((s) =>
                 {
-                    if (!self.isRunning)
+                    if (!isRunning)
                     {
                         return;
                     }
-                    for (var i = 0; self.isRunning && (i < AzureKinectBodyTracker.MaxBody); i++)
+                    for (var i = 0; isRunning && (i < AzureKinectBodyTracker.MaxBody); i++)
                     {
-                        self.bodyVisualizers[i].Apply((i < bodies.Length) ? bodies[i] : Body.Empty, i);
+                        bodyVisualizers[i].Apply((i < bodies.Length) ? bodies[i] : Body.Empty, i);
                     }
-                    self.imuVisualizer.Apply(imuData);
+                    imuVisualizer.Apply(imuData);
                 }, null);
             }
             catch (Exception e)
@@ -99,7 +97,7 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
             var callback = AzureKinectBodyTracker.GetTextureUpdateCallback();
             var commandBuffer = new CommandBuffer();
-            commandBuffer.name = "AzureKinectImagesUpdeate";
+            commandBuffer.name = "AzureKinectImagesUpdate";
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.depthTexture, depthTextureId);
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.colorTexture, colorTextureId);
             commandBuffer.IssuePluginCustomTextureUpdateV2(callback, this.transformedDepthTexture, transformedDepthTextureId);
@@ -170,7 +168,10 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             if (this.fpsMeasured >= 1.0f)
             {
                 var fps = this.bodyFrameCount / this.fpsMeasured;
-                this.bodyFps.text = $"Body FPS : {fps}";
+                if (this.bodyFps != null)
+                {
+                    this.bodyFps.text = $"Body FPS : {fps}";
+                }
                 this.fpsMeasured = 0;
                 this.bodyFrameCount = 0;
             }
@@ -185,8 +186,8 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         {
             this.processCompleted = () =>
             {
-                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly.isOn})");
-                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly.isOn));
+                Debug.Log($"ProcessCompleted -> Start({(DepthMode)index}, CPU Only={this.cpuOnly?.isOn})");
+                this.StartCoroutine(this.Process((DepthMode)index, this.cpuOnly?.isOn ?? false));
             };
             this.StopProcess();
         }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,8 +26,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         private Mesh mesh = null;
         private int pointCloudMaterialIndex = 0;
 
-        private static Controller_PointCloud self;
-
         static void PluginDebugLogCallBack(string message)
         {
             Debug.Log("K4ABT : " + message);
@@ -34,7 +33,6 @@ namespace AzureKinect.Unity.BodyTracker.Sample
 
         void Start()
         {
-            self = this;
             this.syncContext = SynchronizationContext.Current;
 
             this.StartCoroutine(this.Process(DepthMode.NFovUnbinned, false));
@@ -58,24 +56,24 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 }
             }
 
-            self.syncContext.Post((s) =>
+            syncContext.Post((s) =>
             {
-                if (!self.isRunning)
+                if (!isRunning)
                 {
                     return;
                 }
                 else
                 {
-                    self.frameCount++;
+                    frameCount++;
 
-                    if (self.mesh != null)
+                    if (mesh != null)
                     {
-                        self.mesh.vertices = vertices;
-                        self.mesh.RecalculateBounds();
+                        mesh.vertices = vertices;
+                        mesh.RecalculateBounds();
                     }
                     else
                     {
-                        self.InitMesh(vertices);
+                        InitMesh(vertices);
                     }
                 }
             }, null);
@@ -95,17 +93,17 @@ namespace AzureKinect.Unity.BodyTracker.Sample
                 index++;
             }
 
-            self.syncContext.Post((s) =>
+            syncContext.Post((s) =>
             {
-                if (!self.isRunning)
+                if (!isRunning)
                 {
                     return;
                 }
                 else
                 {
-                    if (self.mesh != null)
+                    if (mesh != null)
                     {
-                        self.mesh.colors32 = colors;
+                        mesh.colors32 = colors;
                     }
                 }
             }, null);
@@ -122,7 +120,10 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             }
             this.mesh.vertices = vertices;
             this.mesh.SetIndices(indices, MeshTopology.Points, 0);
-            this.pointCloud.GetComponent<MeshFilter>().mesh = this.mesh;
+            if (this.pointCloud != null)
+            {
+                this.pointCloud.GetComponent<MeshFilter>().mesh = this.mesh;
+            }
         }
 
         private IEnumerator Process(DepthMode depthMode, bool cpuOnly)
@@ -205,7 +206,10 @@ namespace AzureKinect.Unity.BodyTracker.Sample
             if (this.fpsMeasured >= 1.0f)
             {
                 var fps = this.frameCount / this.fpsMeasured;
-                this.bodyFps.text = $"FPS : {fps}";
+                if (this.bodyFps != null)
+                {
+                    this.bodyFps.text = $"FPS : {fps}";
+                }
                 this.fpsMeasured = 0;
                 this.frameCount = 0;
             }
@@ -224,7 +228,14 @@ namespace AzureKinect.Unity.BodyTracker.Sample
         public void SwitchMaterial()
         {
             this.pointCloudMaterialIndex = (this.pointCloudMaterialIndex == 0) ? 1 : 0;
-            this.pointCloud.GetComponent<Renderer>().material = this.pointCloudMaterials[this.pointCloudMaterialIndex];
+            if (this.pointCloud != null)
+            {
+                var renderer = this.pointCloud.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    renderer.material = this.pointCloudMaterials[this.pointCloudMaterialIndex];
+                }
+            }
         }
     }
 }
