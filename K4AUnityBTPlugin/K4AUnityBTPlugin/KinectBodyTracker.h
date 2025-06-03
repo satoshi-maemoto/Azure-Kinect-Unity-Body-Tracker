@@ -4,6 +4,7 @@
 #include <k4abt.h>
 
 #define K4ABT_MAX_BODY 6
+#define K4ABT_INVALID_RESOLUTION -1
 
 typedef void(*DebugLogCallbackPtr)(const char*);
 typedef void(*BodyRecognizedCallbackPtr)(uint32_t numBodies);

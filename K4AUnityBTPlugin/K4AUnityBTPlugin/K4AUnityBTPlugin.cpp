@@ -6,7 +6,7 @@
 
 static DebugLogCallbackPtr debugLogCallback = nullptr;
 static string lastErrorMessage = string();
-static KinectBodyTracker* tracker = nullptr;
+static std::unique_ptr<KinectBodyTracker> tracker = nullptr;
 static unsigned int outputDepthTextureId = 0;
 static unsigned int outputColorTextureId = 0;
 static unsigned int outputTransformedDepthTextureId = 0;
@@ -28,6 +28,8 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 		break;
     case DLL_PROCESS_DETACH:
 		_RPT0(_CRT_WARN, "K4ABTPlugin FreeLibrary DLL_PROCESS_DETACH Start\n");
+
+		K4ABT_End();
 
 		auto releaseTargets = 
 		{
@@ -57,13 +59,13 @@ void DebugLog(const char* message)
 	printf("%s\n", message);
 }
 
-void K4ABT_SetDebugLogCallback(DebugLogCallbackPtr callback)
-{
-	debugLogCallback = callback;
-	if (tracker != nullptr)
-	{
-		tracker->SetDebugLogCallback(debugLogCallback);
-	}
+void K4ABT_SetDebugLogCallback(DebugLogCallbackPtr callback)  
+{  
+   debugLogCallback = callback;  
+   if (tracker != nullptr)  
+   {  
+       tracker->SetDebugLogCallback(debugLogCallback);  
+   }  
 }
 
 __declspec(dllexport) void K4ABT_GetLastErrorMessage(LPWSTR buffer, DWORD bufferSize)
@@ -81,7 +83,7 @@ __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int
 	{
 		if (tracker == nullptr)
 		{
-			tracker = new KinectBodyTracker();
+            tracker = std::make_unique<KinectBodyTracker>();
 			tracker->SetDebugLogCallback(debugLogCallback);
 			tracker->SetBodyRecognizedCallback(bodyRecognizedCallback);
 		}
@@ -98,7 +100,7 @@ __declspec(dllexport) bool K4ABT_Start(unsigned int depthTextureId, unsigned int
 		trackerConfig.processing_mode = cpuOnly ? K4ABT_TRACKER_PROCESSING_MODE_CPU : K4ABT_TRACKER_PROCESSING_MODE_GPU;
 		tracker->Start(deviceConfig, trackerConfig);
 	}
-	catch (exception exception)
+	catch (const exception& exception)
 	{
 		DebugLog(exception.what());
 		lastErrorMessage = exception.what();
@@ -113,12 +115,8 @@ __declspec(dllexport) bool K4ABT_End()
 
 	if (tracker != nullptr)
 	{
-		if (tracker != nullptr)
-		{
-			tracker->Stop();
-			delete tracker;
-			tracker = nullptr;
-		}
+		tracker->Stop();
+		tracker = nullptr;
 
 		outputDepthTextureId = 0;
 		outputColorTextureId = 0;
@@ -130,6 +128,10 @@ __declspec(dllexport) bool K4ABT_End()
 bool K4ABT_GetBody(void* buffer, uint32_t numBodies)
 {
 	if (numBodies > K4ABT_MAX_BODY)
+	{
+		return false;
+	}
+	if (tracker == nullptr)
 	{
 		return false;
 	}
@@ -156,6 +158,10 @@ void K4ABT_SetCalibratedJointPointAvailability(bool availability)
 
 bool K4ABT_GetImuData(void* buffer)
 {
+	if (tracker == nullptr || buffer == nullptr)
+	{
+		return false;
+	}
 	memcpy(buffer, &tracker->imuData , sizeof(KinectBodyTracker::ImuData));
 	return true;
 }

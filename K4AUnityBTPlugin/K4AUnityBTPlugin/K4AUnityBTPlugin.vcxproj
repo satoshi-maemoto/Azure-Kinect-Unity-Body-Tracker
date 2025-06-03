@@ -196,15 +196,15 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.1.10.0\build\native\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.1.10.0\build\native\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.targets')" />
-    <Import Project="..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets')" />
     <Import Project="..\packages\Microsoft.Azure.Kinect.BodyTracking.1.1.2\build\native\Microsoft.Azure.Kinect.BodyTracking.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.1.1.2\build\native\Microsoft.Azure.Kinect.BodyTracking.targets')" />
+    <Import Project="..\packages\Microsoft.Azure.Kinect.Sensor.1.4.2\build\native\Microsoft.Azure.Kinect.Sensor.targets" Condition="Exists('..\packages\Microsoft.Azure.Kinect.Sensor.1.4.2\build\native\Microsoft.Azure.Kinect.Sensor.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.1.10.0\build\native\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.1.10.0\build\native\Microsoft.Azure.Kinect.BodyTracking.ONNXRuntime.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.Sensor.1.4.1\build\native\Microsoft.Azure.Kinect.Sensor.targets'))" />
     <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.BodyTracking.1.1.2\build\native\Microsoft.Azure.Kinect.BodyTracking.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.BodyTracking.1.1.2\build\native\Microsoft.Azure.Kinect.BodyTracking.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Azure.Kinect.Sensor.1.4.2\build\native\Microsoft.Azure.Kinect.Sensor.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Azure.Kinect.Sensor.1.4.2\build\native\Microsoft.Azure.Kinect.Sensor.targets'))" />
   </Target>
 </Project>

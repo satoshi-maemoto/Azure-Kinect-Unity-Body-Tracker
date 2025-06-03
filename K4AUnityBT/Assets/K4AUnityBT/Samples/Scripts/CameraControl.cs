@@ -23,16 +23,19 @@ public class CameraControl : MonoBehaviour
         {
             this.transform.localPosition += new Vector3(
                 Input.GetAxis("Mouse X") * -this.translateSpeed,
-                Input.GetAxis("Mouse Y") * -this.translateSpeed, 
+                Input.GetAxis("Mouse Y") * -this.translateSpeed,
                 0);
         }
 
         if (Input.GetMouseButton(1))
         {
-            this.target.transform.eulerAngles += new Vector3(
-                Input.GetAxis("Mouse Y") * this.rotateSpeed,
-                Input.GetAxis("Mouse X") * -this.rotateSpeed,
-                0);
+            if (this.target != null)
+            {
+                this.target.transform.eulerAngles += new Vector3(
+                    Input.GetAxis("Mouse Y") * this.rotateSpeed,
+                    Input.GetAxis("Mouse X") * -this.rotateSpeed,
+                    0);
+            }
         }
 
         var scroll = Input.GetAxis("Mouse ScrollWheel");
@@ -41,7 +44,7 @@ public class CameraControl : MonoBehaviour
             this.scale += scroll * this.scaleSpeed;
             if (this.scale < 0)
             {
-                this.scale = 0f;
+                this.scale = 0.001f;
             }
             this.target.transform.localScale = new Vector3(this.scale, this.scale, this.scale);
         }

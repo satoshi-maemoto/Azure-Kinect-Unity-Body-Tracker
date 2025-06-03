@@ -20,7 +20,7 @@ static void BodyRecognized(uint32_t numBodies)
 	KinectBodyTracker::Body bodies[K4ABT_MAX_BODY];
 	K4ABT_GetBody(bodies, numBodies);
 
-	for (auto i = 0; i < numBodies; i++)
+	for (auto i = 0; i < (int)numBodies; i++)
 	{
 		for (auto j = 0; j < K4ABT_JOINT_COUNT; j++)
 		{

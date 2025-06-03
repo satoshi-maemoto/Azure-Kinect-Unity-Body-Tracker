@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+
 using UnityEngine;
 
 namespace AzureKinect.Unity.BodyTracker
@@ -115,7 +116,7 @@ namespace AzureKinect.Unity.BodyTracker
     {
         public const int MaxBody = 6;
 
-        public static Dictionary<DepthMode, Vector2> DepthResolutions = new Dictionary<DepthMode, Vector2>()
+        public static readonly Dictionary<DepthMode, Vector2> DepthResolutions = new Dictionary<DepthMode, Vector2>()
         {
             {DepthMode.Off, new Vector2(0, 0)},
             {DepthMode.NFov2X2Binned, new Vector2(320, 288)},
@@ -135,7 +136,7 @@ namespace AzureKinect.Unity.BodyTracker
                 default:
                     break;
             }
-            throw new K4ABTException("This plugin spport Windows x86_64 environment only.");
+            throw new K4ABTException("This plugin spports Windows x86_64 environment only.");
         }
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -206,6 +207,10 @@ namespace AzureKinect.Unity.BodyTracker
         public static Body[] GetBody(UInt32 numBodies)
         {
             var result = new Body[numBodies];
+            if (numBodies == 0)
+            {
+                return result;
+            }
             if (IsValidPlatform())
             {
                 var allocatedMemory = Marshal.AllocHGlobal(bodyBufferSize * (int)numBodies);
@@ -255,7 +260,6 @@ namespace AzureKinect.Unity.BodyTracker
             {
                 var allocatedMemory = Marshal.AllocHGlobal(imuBufferSize);
                 K4ABT_GetImuData(allocatedMemory);
-                var p = allocatedMemory;
                 result = Marshal.PtrToStructure<ImuSample>(allocatedMemory);
                 Marshal.FreeHGlobal(allocatedMemory);
             }
